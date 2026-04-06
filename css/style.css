@@ -1,4 +1,6 @@
 :root {
+  --font-ui: "Inter", Arial, sans-serif;
+  --font-title: "Cinzel", serif;
   --bg: #0f1117;
   --panel: rgba(13, 16, 24, 0.72);
   --line: rgba(255, 255, 255, 0.1);
