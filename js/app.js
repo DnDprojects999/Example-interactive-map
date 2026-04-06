@@ -1,8 +1,11 @@
 const slides = document.getElementById("slides");
 const switchHandle = document.getElementById("switchHandle");
 const slideSwitch = document.getElementById("slideSwitch");
-const switchButton = document.getElementById("switchButton");
 
+const styleHandle = document.getElementById("styleHandle");
+const styleSwitch = document.getElementById("styleSwitch");
+const mapStage = document.getElementById("mapStage");
+const mapCaption = document.getElementById("mapCaption");
 const content = document.getElementById("content");
 const panelButton = document.getElementById("panelButton");
 const panelHandle = document.getElementById("panelHandle");
@@ -20,6 +23,7 @@ const markersContainer = document.getElementById("markersContainer");
 const timelineContainer = document.getElementById("timelineContainer");
 
 let currentSlide = 0;
+let currentStyleMode = 0; // 0 = sketch, 1 = art
 let dragging = false;
 let dragProgress = 0;
 
@@ -37,12 +41,20 @@ function setSlide(index) {
 
   const maxX = getMaxHandleX();
   switchHandle.style.transform = `translateX(${index === 1 ? maxX : 0}px)`;
-
-  switchButton.textContent = index === 0
-    ? "Переключить на таймлайн"
-    : "Вернуться к карте";
 }
+function setStyleMode(index) {
+  currentStyleMode = index;
 
+  const maxX = styleSwitch.clientWidth - styleHandle.clientWidth - 8;
+  styleHandle.style.transform = `translateX(${index === 1 ? maxX : 0}px)`;
+
+  mapStage.classList.toggle("sketch-mode", index === 0);
+  mapStage.classList.toggle("art-mode", index === 1);
+
+  mapCaption.textContent = index === 0
+    ? "Сейчас включён режим: скетч"
+    : "Сейчас включён режим: арт";
+}
 function togglePanel(force) {
   const shouldOpen = typeof force === "boolean"
     ? force
@@ -160,15 +172,17 @@ panelButton.addEventListener("click", () => togglePanel());
 panelHandle.addEventListener("click", () => togglePanel());
 closePanel.addEventListener("click", () => togglePanel(false));
 
-switchButton.addEventListener("click", () => {
-  setSlide(currentSlide === 0 ? 1 : 0);
-});
-
 slideSwitch.addEventListener("click", (event) => {
   if (dragging) return;
   const rect = slideSwitch.getBoundingClientRect();
   const clickX = event.clientX - rect.left;
   setSlide(clickX > rect.width / 2 ? 1 : 0);
+});
+
+styleSwitch.addEventListener("click", (event) => {
+  const rect = styleSwitch.getBoundingClientRect();
+  const clickX = event.clientX - rect.left;
+  setStyleMode(clickX > rect.width / 2 ? 1 : 0);
 });
 
 switchHandle.addEventListener("pointerdown", (event) => {
@@ -197,8 +211,12 @@ function endDrag() {
 
 switchHandle.addEventListener("pointerup", endDrag);
 switchHandle.addEventListener("pointercancel", endDrag);
+styleHandle.addEventListener("click", (event) => {
+  event.stopPropagation();
+});
 window.addEventListener("resize", () => setSlide(currentSlide));
 
 setSlide(0);
+setStyleMode(0);
 togglePanel(true);
 loadData();
