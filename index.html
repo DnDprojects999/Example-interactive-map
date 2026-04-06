@@ -43,14 +43,18 @@
       <div class="slides" id="slides">
         <section class="slide">
           <div class="map-shell">
-            <div class="map-stage" id="mapStage">
+            <div class="map-stage sketch-mode" id="mapStage">
               <div class="map-grid"></div>
-              <div class="map-fog"></div>
+                <div class="map-fog"></div>
 
-              <div id="markersContainer"></div>
+                  <div class="map-background sketch-layer">Скетч карты</div>
+                  <div class="map-background art-layer">Арт карты</div>
 
-              <div class="map-caption">
-                Красная зона — место под будущую интерактивную карту
+                  <div id="markersContainer"></div>
+
+                  <div class="map-caption" id="mapCaption">
+                  Сейчас включён режим: скетч
+                </div>
               </div>
             </div>
           </div>
