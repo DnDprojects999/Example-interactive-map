@@ -616,6 +616,7 @@ button {
   letter-spacing: 0.03em;
   transition: opacity 0.25s ease;
   user-select: none;
+  pointer-events: none;
 }
 
 .sketch-layer {
