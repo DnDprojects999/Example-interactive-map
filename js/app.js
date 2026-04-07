@@ -66,7 +66,7 @@ async function init() {
 
 ui.setStyleMode(0);
 ui.setPanelEditable(false);
-ui.setModeWord("", false);
+ui.setModeWord("Map", true);
 ui.togglePanel(true);
 mapModule.applyMapTransform();
 

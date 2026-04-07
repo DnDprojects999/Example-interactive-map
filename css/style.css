@@ -10,6 +10,7 @@
   --font-ui: "Inter", Arial, sans-serif;
   --font-title: "Cinzel", serif;
   --timeline-strip-h: 92px;
+  --timeline-axis-y: 70%;
 }
 
 * { box-sizing: border-box; }
@@ -95,7 +96,7 @@ button { font: inherit; }
   position: absolute;
   left: 42px;
   right: 42px;
-  top: 70%;
+  top: var(--timeline-axis-y);
   height: 4px;
   border-radius: 999px;
   background: linear-gradient(to right, rgba(255,255,255,.22), rgba(255,255,255,.08));
@@ -109,7 +110,7 @@ button { font: inherit; }
   height: calc(100% - 86px);
   display: flex;
   gap: 18px;
-  align-items: flex-start;
+  align-items: stretch;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 24px 42px 0;
@@ -123,21 +124,22 @@ button { font: inherit; }
 .timeline-events::-webkit-scrollbar-thumb { background: rgba(255,255,255,.25); border-radius: 999px; }
 .timeline-events::-webkit-scrollbar-track { background: transparent; }
 .event-card {
-  flex: 0 0 280px;
   padding: 18px;
   border-radius: 22px;
   background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
   border: 1px solid rgba(255,255,255,.12);
   min-height: 180px;
+}
+.timeline-event-item {
+  flex: 0 0 280px;
   position: relative;
-  margin-top: 0;
 }
 .event-year { color: #fca5a5; margin-bottom: 10px; font-weight: 700; }
 .event-dot {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -58px;
+  top: calc(var(--timeline-axis-y) - 4px);
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -149,7 +151,7 @@ button { font: inherit; }
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: -82px;
+  top: calc(var(--timeline-axis-y) + 20px);
   font-size: 11px;
   color: var(--muted);
   letter-spacing: .04em;
@@ -220,7 +222,7 @@ body.timeline-mode .topbar-center .mode-link { opacity: 0; pointer-events: none;
   .content { inset: 0 0 0 62px; }
   .content { padding: 10px; }
   .timeline-shell { padding: 18px; }
-  .event-card { flex-basis: 240px; }
+  .timeline-event-item { flex-basis: 240px; }
   .timeline-drawer { left: 10px; right: 10px; top: 10px; }
   .timeline-strip { left: 10px; right: 10px; }
   body.timeline-mode .timeline-shell { padding: 18px 18px calc(var(--timeline-strip-h) + 20px); }
