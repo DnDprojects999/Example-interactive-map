@@ -30,15 +30,15 @@ export function createUI(els, state) {
     setModeWord("Timeline", false);
     document.body.classList.add("timeline-mode");
     setSlide(1);
-    setTimeout(() => setModeWord("Timeline", true), 160);
+    setTimeout(() => setModeWord("Timeline", true), 120);
   }
 
   function openMapMode() {
     state.timelineMode = false;
-    setModeWord("Map", false);
+    setModeWord("Map", true);
     document.body.classList.remove("timeline-mode");
     setSlide(0);
-    setTimeout(() => setModeWord("", false), 160);
+    setTimeout(() => setModeWord("", false), 180);
   }
 
   function updatePanelFromMarker(marker) {
