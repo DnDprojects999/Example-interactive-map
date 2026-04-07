@@ -72,7 +72,6 @@ export function createUI(els, state) {
     setModeWord("Map", true);
     document.body.classList.remove("timeline-mode");
     swapSidebarContent(renderMapSidebarButtons);
-    setTimeout(() => setModeWord("", false), 180);
   }
 
   function updatePanelFromMarker(marker) {
@@ -103,6 +102,9 @@ export function createUI(els, state) {
   function renderTimeline() {
     els.timelineContainer.innerHTML = "";
     state.eventsData.forEach((event) => {
+      const item = document.createElement("div");
+      item.className = "timeline-event-item";
+
       const card = document.createElement("article");
       card.className = "event-card";
 
@@ -127,8 +129,9 @@ export function createUI(els, state) {
       dotDate.className = "event-timeline-date";
       dotDate.textContent = event.year || "";
 
-      card.append(year, title, text, dot, dotDate);
-      els.timelineContainer.appendChild(card);
+      card.append(year, title, text);
+      item.append(card, dot, dotDate);
+      els.timelineContainer.appendChild(item);
     });
   }
 
