@@ -17,7 +17,6 @@ export function getElements() {
     regionLabelsContainer: document.getElementById("regionLabelsContainer"),
     content: document.getElementById("content"),
     panelHandle: document.getElementById("panelHandle"),
-    closePanel: document.getElementById("closePanel"),
     deleteMarkerButton: document.getElementById("deleteMarkerButton"),
     panelTitle: document.getElementById("panelTitle"),
     panelSubtitle: document.getElementById("panelSubtitle"),
