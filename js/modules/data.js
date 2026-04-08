@@ -64,6 +64,8 @@ export async function loadData() {
     markersData: markersJson.markers || [],
     eventsData: timelineJson.events || [],
     archiveData: archiveJson.groups || [],
+    regionLabelsData: markersJson.regionLabels || [],
+    drawLayersData: markersJson.drawLayers || [],
   };
 
   const loadedChanges = await tryLoadOptionalChanges();

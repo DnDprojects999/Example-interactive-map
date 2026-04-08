@@ -1,8 +1,31 @@
 import { clamp } from "./state.js";
 
 export function createMapModule(els, state, ui) {
+  function hasBaseMapImage() {
+    return Boolean(els.mapTransform.querySelector("#mapBaseImage, .map-base-image"));
+  }
+
+  function constrainMapOffsetToImageBounds() {
+    if (!hasBaseMapImage()) return;
+
+    const rect = els.mapStage.getBoundingClientRect();
+    const scaledWidth = rect.width * state.mapScale;
+    const scaledHeight = rect.height * state.mapScale;
+
+    const maxOffsetX = scaledWidth <= rect.width ? (rect.width - scaledWidth) / 2 : 0;
+    const minOffsetX = scaledWidth <= rect.width ? maxOffsetX : rect.width - scaledWidth;
+    const maxOffsetY = scaledHeight <= rect.height ? (rect.height - scaledHeight) / 2 : 0;
+    const minOffsetY = scaledHeight <= rect.height ? maxOffsetY : rect.height - scaledHeight;
+
+    state.mapOffsetX = clamp(state.mapOffsetX, minOffsetX, maxOffsetX);
+    state.mapOffsetY = clamp(state.mapOffsetY, minOffsetY, maxOffsetY);
+  }
+
   function applyMapTransform() {
+    constrainMapOffsetToImageBounds();
     els.mapTransform.style.transform = `translate(${state.mapOffsetX}px, ${state.mapOffsetY}px) scale(${state.mapScale})`;
+    document.body.classList.toggle("zoom-near", state.mapScale >= 1.8);
+    els.mapScaleIndicator.textContent = `x${state.mapScale.toFixed(2)}`;
   }
 
   function setupMapNavigation() {

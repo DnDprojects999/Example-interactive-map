@@ -1,6 +1,6 @@
 const CHANGE_SCHEMA_VERSION = 1;
 
-const SUPPORTED_ENTITIES = new Set(["marker", "timelineEvent", "archiveGroup", "archiveItem"]);
+const SUPPORTED_ENTITIES = new Set(["marker", "timelineEvent", "archiveGroup", "archiveItem", "regionLabel", "drawLayer"]);
 
 function deepClone(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
@@ -107,6 +107,23 @@ export function applyChanges(baseData, payload) {
         setById(group.items, change.id, deepClone(change.value));
       } else {
         group.items = removeById(group.items, change.id);
+      }
+    }
+
+    if (change.entity === "regionLabel") {
+      if (change.op === "upsert") {
+        setById(result.regionLabelsData, change.id, deepClone(change.value));
+      } else {
+        result.regionLabelsData = removeById(result.regionLabelsData, change.id);
+      }
+      return;
+    }
+
+    if (change.entity === "drawLayer") {
+      if (change.op === "upsert") {
+        setById(result.drawLayersData, change.id, deepClone(change.value));
+      } else {
+        result.drawLayersData = removeById(result.drawLayersData, change.id);
       }
     }
   });

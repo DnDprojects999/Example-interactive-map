@@ -1,15 +1,23 @@
 export const state = {
   currentSlide: 0,
   currentPalette: "ember",
+  customPalettes: [],
 
   groupsData: [],
   markersData: [],
   eventsData: [],
   archiveData: [],
+  regionLabelsData: [],
+  drawLayersData: [],
 
   currentMarker: null,
+  currentRegionLabel: null,
   editMode: false,
   editorGroupId: null,
+  activeDrawLayerId: null,
+  drawMode: false,
+  drawBrushColor: "#7dd3fc",
+  drawBrushSize: 2,
   timelineMode: false,
   archiveMode: false,
   activeArchiveGroupId: null,
