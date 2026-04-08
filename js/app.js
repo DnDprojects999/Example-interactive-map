@@ -80,7 +80,11 @@ function setupTopLevelInteractions() {
     if (!state.timelineMode) ui.openTimelineMode();
   });
   els.archiveOpenButton.addEventListener("click", () => {
-    if (!state.timelineMode) ui.openArchiveMode();
+    if (state.archiveMode) {
+      ui.openMapMode();
+      return;
+    }
+    ui.openArchiveMode();
   });
   els.mapReturnButton.addEventListener("click", () => ui.openMapMode());
 

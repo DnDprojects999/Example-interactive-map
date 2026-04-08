@@ -18,6 +18,8 @@ export const state = {
   drawMode: false,
   drawBrushColor: "#7dd3fc",
   drawBrushSize: 2,
+  regionLabelsVisible: true,
+  regionTextMode: false,
   timelineMode: false,
   archiveMode: false,
   activeArchiveGroupId: null,

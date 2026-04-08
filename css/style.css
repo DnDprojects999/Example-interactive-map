@@ -35,7 +35,7 @@ button { font: inherit; }
 .mode-word { font-size: 28px; opacity: 0; transform: translateY(-6px); transition: opacity .22s ease, transform .22s ease; }
 .mode-word.show { opacity: 1; transform: translateY(0); }
 
-.topbar-center { display: flex; justify-content: center; }
+.topbar-center { display: flex; justify-content: center; gap: 10px; }
 .topbar-right { display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
 
 .mode-link {
@@ -58,18 +58,6 @@ button { font: inherit; }
 .tool-btn { width: 48px; height: 48px; border-radius: 14px; border: 1px solid var(--line-strong); background: rgba(255,255,255,.06); color: #fff; cursor: pointer; position: relative; }
 .tool-btn.active { background: rgba(255,255,255,.16); }
 .tool-btn.editor-target { outline: 2px solid #22c55e; }
-.archive-open-btn {
-  margin-top: auto;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  border: 1px solid var(--line-strong);
-  background: rgba(255,255,255,.06);
-  color: #fff;
-  cursor: pointer;
-  font-size: 22px;
-}
-
 .content { position: absolute; inset: 0 0 0 var(--sidebar-w); overflow: hidden; padding: 22px; }
 
 .map-shell, .timeline-shell { width: 100%; height: 100%; border-radius: 28px; border: 1px solid var(--line); background: rgba(255,255,255,.02); position: relative; overflow: hidden; }
