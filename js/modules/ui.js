@@ -350,7 +350,15 @@ export function createUI(els, state) {
 
   function createArchiveItem() {
     if (!state.editMode) return;
-    const groupId = state.activeArchiveGroupId || state.archiveData[0]?.id;
+    const groupChoices = state.archiveData
+      .map((group, index) => `${index + 1}. ${group.title || `Глава ${index + 1}`}`)
+      .join("\n");
+    if (!groupChoices) return;
+    const selectedGroupRaw = window.prompt(`В какую главу добавить карточку?\n${groupChoices}`, "1");
+    if (!selectedGroupRaw) return;
+    const selectedIndex = Number(selectedGroupRaw) - 1;
+    const selectedGroup = state.archiveData[selectedIndex];
+    const groupId = selectedGroup?.id || state.activeArchiveGroupId || state.archiveData[0]?.id;
     const group = state.archiveData.find((entry) => entry.id === groupId);
     if (!group) return;
     group.items = Array.isArray(group.items) ? group.items : [];

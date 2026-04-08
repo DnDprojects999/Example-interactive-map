@@ -38,6 +38,46 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       els.toolButtonsContainer.appendChild(button);
     });
 
+    const labelsButton = document.createElement("button");
+    labelsButton.className = `tool-btn ${state.regionLabelsVisible ? "active" : ""}`;
+    labelsButton.title = state.editMode ? "Режим редактирования подписей территорий" : "Показать/скрыть подписи территорий";
+    labelsButton.textContent = "Т";
+    labelsButton.addEventListener("click", () => {
+      if (state.editMode) {
+        state.regionTextMode = !state.regionTextMode;
+        labelsButton.classList.toggle("active", state.regionTextMode);
+        els.panelSubtitle.textContent = state.regionTextMode
+          ? "Редактирование подписей территорий"
+          : "Режим редактирования включён";
+        renderRegionLabels();
+        return;
+      }
+      state.regionLabelsVisible = !state.regionLabelsVisible;
+      labelsButton.classList.toggle("active", state.regionLabelsVisible);
+      renderRegionLabels();
+    });
+    els.toolButtonsContainer.appendChild(labelsButton);
+
+    state.drawLayersData.forEach((layer, index) => {
+      const layerButton = document.createElement("button");
+      layerButton.className = `tool-btn ${layer.visible !== false ? "active" : ""}`;
+      layerButton.title = layer.name || `Слой ${index + 1}`;
+      layerButton.textContent = "◻";
+      layerButton.addEventListener("click", () => {
+        if (state.editMode) {
+          state.activeDrawLayerId = layer.id;
+          state.drawMode = true;
+          ui.setMapEditorControlsVisible(true, true);
+          els.panelSubtitle.textContent = `Выбран слой рисования: ${layer.name || `Слой ${index + 1}`}`;
+          return;
+        }
+        layer.visible = layer.visible === false;
+        renderDrawLayers();
+        renderGroups();
+      });
+      els.toolButtonsContainer.appendChild(layerButton);
+    });
+
     if (state.editMode) {
       const addLayerButton = document.createElement("button");
       addLayerButton.className = "tool-btn";
@@ -45,6 +85,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       addLayerButton.textContent = "+";
       addLayerButton.addEventListener("click", () => {
         createDrawLayer();
+        renderGroups();
       });
       els.toolButtonsContainer.appendChild(addLayerButton);
     }
@@ -138,6 +179,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     state.drawLayersData.push(layer);
     state.activeDrawLayerId = layer.id;
     changesManager.upsert("drawLayer", layer.id, layer);
+    renderGroups();
     renderDrawLayers();
     renderDrawLayerPanel();
   }
@@ -228,6 +270,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
 
   function renderRegionLabels() {
     els.regionLabelsContainer.innerHTML = "";
+    if (!state.regionLabelsVisible) return;
     state.regionLabelsData.forEach((label) => {
       const el = document.createElement("div");
       el.className = "region-label";
@@ -241,7 +284,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       el.style.color = label.color || "#dbeafe";
       el.style.transform = `translate(-50%, -50%) rotate(${label.rotation || 0}deg)`;
       el.textContent = label.text || "Новая подпись";
-      el.contentEditable = String(state.editMode);
+      el.contentEditable = String(state.editMode && state.regionTextMode);
 
       el.addEventListener("input", () => {
         label.text = el.textContent.trim();
@@ -291,6 +334,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     if (!state.editorGroupId && state.groupsData.length > 0) {
       state.editorGroupId = state.groupsData[0].id;
     }
+    if (!state.editMode) state.regionTextMode = false;
 
     els.exportDataButton.hidden = !state.editMode;
     els.deleteMarkerButton.hidden = !state.editMode;
@@ -335,6 +379,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
   function setupEditorInteractions() {
     let drawingStroke = null;
     ensureDefaultDrawLayer();
+    renderGroups();
     renderDrawLayers();
     renderRegionLabels();
     renderDrawLayerPanel();
@@ -361,6 +406,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       if (!state.editMode) return;
       if (event.target.closest(".region-label")) return;
       if (state.drawMode) return;
+      if (state.regionTextMode) return;
       if (event.target.classList.contains("marker")) return;
 
       const { x, y } = mapModule.getMapPercentFromClient(event.clientX, event.clientY);
