@@ -109,8 +109,42 @@ button { font: inherit; }
 .map-stage { position: absolute; inset: 18px; border-radius: 24px; border: 2px solid var(--map-border); background: var(--map-fill); overflow: hidden; cursor: grab; }
 .map-stage.panning { cursor: grabbing; }
 .map-transform { position: absolute; inset: 0; transform-origin: 0 0; will-change: transform; }
-.map-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px); background-size: 46px 46px; opacity: .45; }
-.map-fog { position: absolute; inset: 0; background: radial-gradient(circle at 20% 25%, var(--fog-a), transparent 18%), radial-gradient(circle at 70% 40%, var(--fog-b), transparent 24%), radial-gradient(circle at 55% 78%, var(--fog-c), transparent 16%); opacity: .45; }
+.map-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: rgba(5, 8, 18, .5);
+  background-image: var(--map-photo-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+.map-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 18px, transparent 18px 36px);
+  background-size: 46px 46px, 46px 46px, 36px 100%;
+  opacity: .5;
+}
+.map-fog {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    radial-gradient(circle at 20% 25%, var(--fog-a), transparent 18%),
+    radial-gradient(circle at 70% 40%, var(--fog-b), transparent 24%),
+    radial-gradient(circle at 55% 78%, var(--fog-c), transparent 16%),
+    radial-gradient(circle at 14% 20%, rgba(255,255,255,.22), transparent 14%),
+    radial-gradient(circle at 75% 30%, rgba(153, 203, 255, .17), transparent 16%),
+    radial-gradient(circle at 58% 82%, rgba(204, 233, 255, .18), transparent 12%);
+  opacity: .58;
+  mix-blend-mode: screen;
+  animation: shimmerDrift 16s linear infinite;
+}
 #markersContainer { position: absolute; inset: 0; z-index: 6; }
 .draw-svg {
   position: absolute;
@@ -119,6 +153,12 @@ button { font: inherit; }
   height: 100%;
   z-index: 4;
   pointer-events: none;
+}
+
+@keyframes shimmerDrift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-1.5%, 1%, 0) scale(1.02); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
 }
 .region-labels {
   position: absolute;
@@ -587,7 +627,8 @@ body.edit-mode .archive-expanded-text {
 
 /* Timeline overlay mode */
 body.timeline-mode .info-panel,
-body.timeline-mode #exportDataButton { opacity: 0; pointer-events: none; }
+body.timeline-mode #exportDataButton,
+body.timeline-mode #uploadMapTextureButton { opacity: 0; pointer-events: none; }
 body.timeline-mode .timeline-drawer {
   transform: translateY(0);
   opacity: 1;

@@ -1,4 +1,20 @@
 export function createEditorModule(els, state, ui, mapModule, changesManager) {
+  let activeMapTextureObjectUrl = null;
+
+  function applyMapTexture(source) {
+    els.mapPhotoLayer.style.setProperty("--map-photo-image", source ? `url("${source}")` : "none");
+  }
+
+  function handleMapTextureSelection(file) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) return;
+    if (activeMapTextureObjectUrl) URL.revokeObjectURL(activeMapTextureObjectUrl);
+    activeMapTextureObjectUrl = URL.createObjectURL(file);
+    applyMapTexture(activeMapTextureObjectUrl);
+    els.panelSubtitle.textContent = `Фоновая карта обновлена: ${file.name}`;
+    els.panelText.textContent = "Фото применено как базовый слой карты. Сетка и блики остаются сверху полупрозрачно.";
+  }
+
   /**
    * Подсвечивает кнопку слоя, выбранного как "цель редактирования".
    * В обычном режиме (не edit-mode) кнопки работают как фильтры видимости.
@@ -362,6 +378,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     if (!state.editMode) state.regionTextMode = false;
 
     els.exportDataButton.hidden = !state.editMode;
+    els.uploadMapTextureButton.hidden = !state.editMode;
     els.deleteMarkerButton.hidden = !state.editMode;
     els.drawLayerPanel.hidden = !state.editMode;
     els.addPaletteButton.hidden = !state.editMode;
@@ -520,12 +537,22 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     });
 
     els.exportDataButton.addEventListener("click", exportWorldChangesJson);
+    els.uploadMapTextureButton.addEventListener("click", () => els.mapTextureInput.click());
+    els.mapTextureInput.addEventListener("change", (event) => {
+      const [file] = event.target.files || [];
+      handleMapTextureSelection(file);
+      event.target.value = "";
+    });
 
     document.addEventListener("keydown", (event) => {
       if (event.ctrlKey && event.shiftKey && event.code === "Backquote") {
         event.preventDefault();
         toggleEditMode();
       }
+    });
+
+    window.addEventListener("beforeunload", () => {
+      if (activeMapTextureObjectUrl) URL.revokeObjectURL(activeMapTextureObjectUrl);
     });
   }
 
