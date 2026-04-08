@@ -50,7 +50,6 @@ const panelEditableFields = [els.panelTitle, els.panelSubtitle, els.panelImageCa
  */
 function setupTopLevelInteractions() {
   els.panelHandle.addEventListener("click", () => ui.togglePanel());
-  els.closePanel.addEventListener("click", () => ui.togglePanel(false));
   els.deleteMarkerButton.addEventListener("click", () => editor.deleteCurrentMarker());
 
   els.paletteToggle.addEventListener("click", (event) => {

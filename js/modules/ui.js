@@ -24,7 +24,6 @@ export function createUI(els, state) {
   const editableTimelineFields = ["event-year", "event-title", "event-text"];
   const editableArchiveFields = [
     "archive-group-title",
-    "archive-card-image",
     "archive-card-title",
     "archive-card-text",
     "archive-expanded-title",
@@ -112,6 +111,30 @@ export function createUI(els, state) {
 
   function setSidebarTitle(text) {
     els.sidebarTitle.textContent = text;
+  }
+
+  function readFileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = () => reject(new Error("Не удалось прочитать файл изображения."));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderArchiveCardImage(imageNode, item) {
+    imageNode.innerHTML = "";
+    const imageUrl = item?.imageUrl?.trim() || "";
+    if (!imageUrl) {
+      imageNode.textContent = item?.imageLabel || "Изображение";
+      return;
+    }
+
+    const preview = document.createElement("img");
+    preview.className = "archive-card-image-preview";
+    preview.src = imageUrl;
+    preview.alt = item?.imageLabel || item?.title || "Иллюстрация карточки архива";
+    imageNode.appendChild(preview);
   }
 
   function scrollToTimelineEvent(eventId) {
@@ -474,8 +497,10 @@ export function createUI(els, state) {
 
         const image = document.createElement("div");
         image.className = "archive-card-image";
-        image.textContent = item.imageLabel || "Изображение";
-        image.contentEditable = String(state.editMode);
+        renderArchiveCardImage(image, item);
+        if (state.editMode) {
+          image.title = "Вставь/перетащи изображение. Двойной клик — изменить подпись.";
+        }
 
         const title = document.createElement("h3");
         title.className = "archive-card-title";
@@ -620,7 +645,7 @@ export function createUI(els, state) {
       el.contentEditable = String(enabled);
     });
     els.archiveGroupsContainer
-      .querySelectorAll(".archive-group-title, .archive-card-image, .archive-card-title, .archive-card-text, .archive-expanded-title, .archive-expanded-text")
+      .querySelectorAll(".archive-group-title, .archive-card-title, .archive-card-text, .archive-expanded-title, .archive-expanded-text")
       .forEach((el) => {
         el.contentEditable = String(enabled);
       });
@@ -744,7 +769,6 @@ export function createUI(els, state) {
         const item = group?.items?.find((entry) => entry.id === itemId);
         if (!group || !item) return;
 
-        if (target.classList.contains("archive-card-image")) item.imageLabel = target.textContent.trim();
         if (target.classList.contains("archive-card-title")) item.title = target.textContent.trim();
         if (target.classList.contains("archive-card-text")) item.description = target.textContent.trim();
 
@@ -764,6 +788,79 @@ export function createUI(els, state) {
       if (target.classList.contains("archive-expanded-text")) item.fullDescription = target.textContent.trim();
 
       recordChange("archiveItem", item.id, item, { groupId: group.id });
+    });
+
+    const archiveImageFileInput = document.createElement("input");
+    archiveImageFileInput.type = "file";
+    archiveImageFileInput.accept = "image/*";
+    archiveImageFileInput.hidden = true;
+    document.body.appendChild(archiveImageFileInput);
+    let activeArchiveImageTarget = null;
+
+    const resolveArchiveImageItem = (target) => {
+      const imageNode = target?.closest?.(".archive-card-image");
+      const card = target?.closest?.(".archive-card");
+      if (!imageNode || !card) return null;
+      const group = state.archiveData.find((entry) => entry.id === card.dataset.groupId);
+      const item = group?.items?.find((entry) => entry.id === card.dataset.itemId);
+      if (!group || !item) return null;
+      return { imageNode, group, item };
+    };
+
+    const applyArchiveImageFile = async (file, imageNode, group, item) => {
+      if (!file || !state.editMode || !file.type?.startsWith("image/")) return;
+      try {
+        item.imageUrl = await readFileToDataUrl(file);
+        renderArchiveCardImage(imageNode, item);
+        recordChange("archiveItem", item.id, item, { groupId: group.id });
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    els.archiveGroupsContainer.addEventListener("dblclick", (event) => {
+      if (!state.editMode) return;
+      const resolved = resolveArchiveImageItem(event.target);
+      if (!resolved) return;
+      event.preventDefault();
+      const nextLabel = window.prompt("Подпись изображения", resolved.item.imageLabel || "Изображение");
+      if (nextLabel == null) return;
+      resolved.item.imageLabel = nextLabel.trim() || "Изображение";
+      renderArchiveCardImage(resolved.imageNode, resolved.item);
+      recordChange("archiveItem", resolved.item.id, resolved.item, { groupId: resolved.group.id });
+    });
+
+    els.archiveGroupsContainer.addEventListener("click", (event) => {
+      if (!state.editMode) return;
+      const resolved = resolveArchiveImageItem(event.target);
+      if (!resolved) return;
+      activeArchiveImageTarget = resolved;
+      archiveImageFileInput.click();
+    });
+
+    archiveImageFileInput.addEventListener("change", async (event) => {
+      const [file] = Array.from(event.target.files || []);
+      if (file && activeArchiveImageTarget) {
+        await applyArchiveImageFile(
+          file,
+          activeArchiveImageTarget.imageNode,
+          activeArchiveImageTarget.group,
+          activeArchiveImageTarget.item,
+        );
+      }
+      archiveImageFileInput.value = "";
+      activeArchiveImageTarget = null;
+    });
+
+    els.archiveGroupsContainer.addEventListener("paste", async (event) => {
+      if (!state.editMode) return;
+      const resolved = resolveArchiveImageItem(event.target);
+      if (!resolved) return;
+      const imageItem = Array.from(event.clipboardData?.items || []).find((item) => item.type.startsWith("image/"));
+      const file = imageItem?.getAsFile();
+      if (!file) return;
+      event.preventDefault();
+      await applyArchiveImageFile(file, resolved.imageNode, resolved.group, resolved.item);
     });
 
     els.archiveGroupsContainer.addEventListener("dragstart", (event) => {
@@ -786,14 +883,42 @@ export function createUI(els, state) {
     });
 
     els.archiveGroupsContainer.addEventListener("dragover", (event) => {
-      if (!state.editMode || !dragArchiveCardMeta) return;
+      if (!state.editMode) return;
+
+      const resolved = resolveArchiveImageItem(event.target);
+      if (resolved && !dragArchiveCardMeta) {
+        event.preventDefault();
+        resolved.imageNode.classList.add("is-drop-target");
+        event.dataTransfer.dropEffect = "copy";
+        return;
+      }
+
+      if (!dragArchiveCardMeta) return;
       if (!event.target.closest(".archive-card")) return;
       event.preventDefault();
       event.dataTransfer.dropEffect = "move";
     });
 
-    els.archiveGroupsContainer.addEventListener("drop", (event) => {
-      if (!state.editMode || !dragArchiveCardMeta) return;
+    els.archiveGroupsContainer.addEventListener("dragleave", (event) => {
+      const imageNode = event.target?.closest?.(".archive-card-image");
+      if (!imageNode) return;
+      imageNode.classList.remove("is-drop-target");
+    });
+
+    els.archiveGroupsContainer.addEventListener("drop", async (event) => {
+      if (!state.editMode) return;
+
+      const resolved = resolveArchiveImageItem(event.target);
+      if (resolved && !dragArchiveCardMeta) {
+        const [file] = Array.from(event.dataTransfer?.files || []);
+        if (!file) return;
+        event.preventDefault();
+        resolved.imageNode.classList.remove("is-drop-target");
+        await applyArchiveImageFile(file, resolved.imageNode, resolved.group, resolved.item);
+        return;
+      }
+
+      if (!dragArchiveCardMeta) return;
       const targetCard = event.target.closest(".archive-card");
       if (!targetCard) return;
       event.preventDefault();
@@ -841,13 +966,6 @@ export function createUI(els, state) {
       if (event.key !== "Enter") return;
       event.preventDefault();
       commitCurrentMarkerImage();
-    });
-
-    const readFileToDataUrl = (file) => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = () => reject(new Error("Не удалось прочитать файл изображения."));
-      reader.readAsDataURL(file);
     });
 
     const applyFile = async (file) => {
