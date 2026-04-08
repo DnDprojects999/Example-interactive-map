@@ -13,6 +13,7 @@ export function getElements() {
     addPaletteButton: document.getElementById("addPaletteButton"),
     mapStage: document.getElementById("mapStage"),
     mapTransform: document.getElementById("mapTransform"),
+    mapPhotoLayer: document.getElementById("mapPhotoLayer"),
     drawSvg: document.getElementById("drawSvg"),
     regionLabelsContainer: document.getElementById("regionLabelsContainer"),
     content: document.getElementById("content"),
@@ -56,6 +57,8 @@ export function getElements() {
     drawBrushSizeInput: document.getElementById("drawBrushSizeInput"),
     drawBrushColorSelect: document.getElementById("drawBrushColorSelect"),
     mapScaleIndicator: document.getElementById("mapScaleIndicator"),
+    uploadMapTextureButton: document.getElementById("uploadMapTextureButton"),
+    mapTextureInput: document.getElementById("mapTextureInput"),
     exportDataButton: document.getElementById("exportDataButton"),
   };
 

@@ -24,6 +24,8 @@
     </div>
 
     <div class="topbar-right">
+      <button class="btn" id="uploadMapTextureButton" hidden>Заливка карты</button>
+      <input id="mapTextureInput" type="file" accept="image/*" hidden />
       <button class="btn" id="exportDataButton" hidden>Экспорт JSON</button>
     </div>
   </header>
@@ -47,6 +49,7 @@
       <div class="map-shell">
         <div class="map-stage" id="mapStage">
           <div class="map-transform" id="mapTransform">
+            <div class="map-photo" id="mapPhotoLayer"></div>
             <div class="map-grid"></div>
             <div class="map-fog"></div>
 
