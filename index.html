@@ -36,6 +36,7 @@
           <button class="palette-option" type="button" data-palette-value="ember">Ember</button>
           <button class="palette-option" type="button" data-palette-value="night">Night</button>
           <button class="palette-option" type="button" data-palette-value="frost">Frost</button>
+          <button class="palette-option" id="addPaletteButton" type="button" hidden>+ Add palette</button>
         </div>
       </div>
       <div id="toolButtonsContainer"></div>
@@ -49,6 +50,8 @@
             <div class="map-grid"></div>
             <div class="map-fog"></div>
 
+            <svg id="drawSvg" class="draw-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+            <div id="regionLabelsContainer" class="region-labels"></div>
             <div id="markersContainer"></div>
           </div>
         </div>
@@ -86,11 +89,23 @@
               <div class="panel-subtitle" id="panelSubtitle">Информационная панель</div>
             </div>
 
+            <button class="ghost-btn" id="deleteMarkerButton" hidden>Удалить метку</button>
             <button class="ghost-btn" id="closePanel">Закрыть</button>
           </div>
 
           <div class="panel-image" id="panelImage">
-            Здесь позже может быть портрет города, герб, карта региона или иллюстрация точки интереса
+            <img class="panel-image-preview" id="panelImagePreview" alt="Превью" hidden />
+            <div class="panel-image-caption" id="panelImageCaption">
+              Здесь позже может быть портрет города, герб, карта региона или иллюстрация точки интереса
+            </div>
+          </div>
+
+          <div class="panel-image-controls" id="panelImageControls" hidden>
+            <input class="panel-image-url-input" id="panelImageUrlInput" type="text" placeholder="https://... или /assets/..." />
+            <button class="ghost-btn" id="applyImageUrlButton" type="button">Применить URL</button>
+            <label class="ghost-btn panel-file-label" for="panelImageFileInput">Загрузить файл</label>
+            <input id="panelImageFileInput" type="file" accept="image/*" hidden />
+            <div class="panel-image-hint" id="panelImageHint">Можно вставить URL или перетащить файл на область превью.</div>
           </div>
 
           <div class="panel-text" id="panelText">
@@ -104,6 +119,34 @@
           </div>
         </div>
       </aside>
+
+      <div class="editor-actions" id="editorActions" hidden>
+        <button class="editor-action-btn" id="addRegionLabelButton" type="button" hidden>+ Подпись региона</button>
+        <button class="editor-action-btn" id="toggleDrawModeButton" type="button" hidden>✎ Рисование</button>
+        <button class="editor-action-btn" id="addTimelineEventButton" type="button" hidden>+ Событие</button>
+        <button class="editor-action-btn" id="addArchiveGroupButton" type="button" hidden>+ Глава архива</button>
+        <button class="editor-action-btn" id="addArchiveItemButton" type="button" hidden>+ Карточка архива</button>
+      </div>
+
+      <div class="map-text-toolbar" id="mapTextToolbar" hidden>
+        <select id="mapTextFontSelect"></select>
+        <input id="mapTextSizeInput" type="number" min="10" max="120" step="1" />
+        <button id="mapTextBoldButton" type="button"><b>B</b></button>
+        <button id="mapTextItalicButton" type="button"><i>I</i></button>
+        <input id="mapTextColorInput" type="color" />
+        <label>⟳ <input id="mapTextRotateInput" type="range" min="-180" max="180" step="1" /></label>
+      </div>
+
+      <div class="draw-layer-panel" id="drawLayerPanel" hidden>
+        <div class="draw-layer-header">Слои рисования</div>
+        <div id="drawLayerList"></div>
+        <div class="draw-tools">
+          <label>Кисть <input id="drawBrushSizeInput" type="range" min="1" max="8" step="0.5" value="2" /></label>
+          <select id="drawBrushColorSelect"></select>
+        </div>
+      </div>
+
+      <div class="map-scale-indicator" id="mapScaleIndicator">x1.00</div>
     </div>
   </div>
 

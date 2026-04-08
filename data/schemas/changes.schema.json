@@ -20,7 +20,7 @@
         "type": "object",
         "required": ["entity", "op", "id"],
         "properties": {
-          "entity": { "enum": ["marker", "timelineEvent", "archiveGroup", "archiveItem"] },
+          "entity": { "enum": ["marker", "timelineEvent", "archiveGroup", "archiveItem", "regionLabel", "drawLayer"] },
           "op": { "enum": ["upsert", "remove"] },
           "id": { "type": "string", "minLength": 1 },
           "groupId": { "type": "string" },

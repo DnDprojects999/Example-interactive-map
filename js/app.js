@@ -21,6 +21,7 @@ const changesManager = createChangesManager();
 const editor = createEditorModule(els, state, ui, mapModule, changesManager);
 assertModuleApi("ui", ui, [
   "setSidebarRenderers",
+  "setupMapEditorCallbacks",
   "setChangeRecorder",
   "setPalette",
   "togglePalettePopover",
@@ -31,14 +32,17 @@ assertModuleApi("ui", ui, [
   "openTimelineMode",
   "openArchiveMode",
   "openMapMode",
+  "openMapTextToolbar",
+  "closeMapTextToolbar",
+  "setMapEditorControlsVisible",
   "savePanelToCurrentMarker",
   "updatePanelFromMarker",
 ]);
 assertModuleApi("mapModule", mapModule, ["applyMapTransform", "setupMapNavigation", "getMapPercentFromClient"]);
-assertModuleApi("editor", editor, ["renderGroups", "renderMarkers", "setupEditorInteractions"]);
+assertModuleApi("editor", editor, ["renderGroups", "renderMarkers", "renderRegionLabels", "renderDrawLayers", "setupEditorInteractions", "deleteCurrentMarker"]);
 ui.setSidebarRenderers({ mapButtonsRenderer: editor.renderGroups });
 ui.setChangeRecorder((entity, id, value) => changesManager.upsert(entity, id, value));
-const panelEditableFields = [els.panelTitle, els.panelSubtitle, els.panelText, els.fact1, els.fact2, els.fact3];
+const panelEditableFields = [els.panelTitle, els.panelSubtitle, els.panelImageCaption, els.panelText, els.fact1, els.fact2, els.fact3];
 
 /**
  * Регистрирует пользовательские взаимодействия верхнего уровня (без привязки к конкретному режиму карты).
@@ -47,6 +51,7 @@ const panelEditableFields = [els.panelTitle, els.panelSubtitle, els.panelText, e
 function setupTopLevelInteractions() {
   els.panelHandle.addEventListener("click", () => ui.togglePanel());
   els.closePanel.addEventListener("click", () => ui.togglePanel(false));
+  els.deleteMarkerButton.addEventListener("click", () => editor.deleteCurrentMarker());
 
   els.paletteToggle.addEventListener("click", (event) => {
     event.stopPropagation();
@@ -102,6 +107,8 @@ async function init() {
     state.markersData = data.markersData;
     state.eventsData = data.eventsData;
     state.archiveData = data.archiveData;
+    state.regionLabelsData = data.regionLabelsData || [];
+    state.drawLayersData = data.drawLayersData || [];
     state.editorGroupId = state.groupsData[0]?.id || null;
 
     changesManager.setBaseVersion(data.loadedChanges?.meta?.baseVersion || "base-local-json");
@@ -111,6 +118,8 @@ async function init() {
 
     editor.renderGroups();
     editor.renderMarkers();
+    editor.renderRegionLabels();
+    editor.renderDrawLayers();
     ui.renderTimeline();
   } catch (error) {
     console.error("Ошибка загрузки данных:", error);
