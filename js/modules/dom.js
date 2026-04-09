@@ -42,6 +42,7 @@ export function getElements() {
     editorActions: document.getElementById("editorActions"),
     addTimelineEventButton: document.getElementById("addTimelineEventButton"),
     addRegionLabelButton: document.getElementById("addRegionLabelButton"),
+    toggleTextMoveModeButton: document.getElementById("toggleTextMoveModeButton"),
     toggleDrawModeButton: document.getElementById("toggleDrawModeButton"),
     addArchiveGroupButton: document.getElementById("addArchiveGroupButton"),
     addArchiveItemButton: document.getElementById("addArchiveItemButton"),

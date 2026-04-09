@@ -174,12 +174,20 @@ button { font: inherit; }
   cursor: move;
   user-select: none;
   white-space: nowrap;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
 .region-label.text-editable {
   cursor: text;
   user-select: text;
 }
 .marker { position: absolute; width: 18px; height: 18px; border-radius: 999px; border: 2px solid rgba(255,255,255,.82); transform: translate(-50%, -50%); cursor: pointer; }
+.marker {
+  transform: translate(-50%, -50%) scale(var(--overlay-scale-inverse, 1));
+  transform-origin: center;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
 .marker.hidden { display: none; }
 .marker-name {
   position: absolute;
@@ -193,6 +201,8 @@ button { font: inherit; }
   opacity: 0;
   transition: opacity .2s ease;
   pointer-events: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
 body.zoom-near .marker-name { opacity: 1; }
 body.zoom-near .region-label { opacity: 0; }
@@ -497,7 +507,7 @@ body.edit-mode .archive-card-image {
   position: absolute;
   left: 50%;
   transform: translate(-50%, -50%);
-  top: var(--timeline-axis-y);
+  top: calc(var(--timeline-axis-y) + 24px);
   width: 12px;
   height: 12px;
   border-radius: 50%;
@@ -509,7 +519,7 @@ body.edit-mode .archive-card-image {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: calc(var(--timeline-axis-y) + 20px);
+  top: calc(var(--timeline-axis-y) + 44px);
   font-size: 11px;
   color: var(--muted);
   letter-spacing: .04em;

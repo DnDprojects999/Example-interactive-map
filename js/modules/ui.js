@@ -5,6 +5,7 @@ export function createUI(els, state) {
   let archiveScrollObserver = null;
   let mapEditorCallbacks = {
     onCreateRegionLabel: () => {},
+    onToggleTextMoveMode: () => {},
     onToggleDrawMode: () => {},
     onTextStyleChange: () => {},
     onBrushChange: () => {},
@@ -287,6 +288,7 @@ export function createUI(els, state) {
 
     els.editorActions.hidden = !shouldShowAny;
     els.addRegionLabelButton.hidden = !inMap;
+    els.toggleTextMoveModeButton.hidden = !inMap;
     els.toggleDrawModeButton.hidden = !inMap;
     els.addTimelineEventButton.hidden = !inTimeline;
     els.addArchiveGroupButton.hidden = !inArchive;
@@ -294,8 +296,9 @@ export function createUI(els, state) {
   }
 
   function setMapEditorControlsVisible(visible, drawModeActive) {
-    els.drawLayerPanel.hidden = !visible;
+    els.drawLayerPanel.hidden = !(visible && drawModeActive);
     els.toggleDrawModeButton.classList.toggle("active", Boolean(drawModeActive));
+    els.toggleTextMoveModeButton.classList.toggle("active", Boolean(state.regionTextMoveMode));
   }
 
   function openMapTextToolbar(label, rect) {
@@ -404,6 +407,7 @@ export function createUI(els, state) {
 
   function setupEditorActionButtons() {
     els.addRegionLabelButton.addEventListener("click", () => mapEditorCallbacks.onCreateRegionLabel());
+    els.toggleTextMoveModeButton.addEventListener("click", () => mapEditorCallbacks.onToggleTextMoveMode());
     els.toggleDrawModeButton.addEventListener("click", () => mapEditorCallbacks.onToggleDrawMode());
     els.addTimelineEventButton.addEventListener("click", createTimelineEvent);
     els.addArchiveGroupButton.addEventListener("click", createArchiveGroup);
