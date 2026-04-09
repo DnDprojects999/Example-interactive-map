@@ -1,3 +1,5 @@
+import { clamp } from "./state.js";
+
 export function createEditorModule(els, state, ui, mapModule, changesManager) {
   let activeMapTextureObjectUrl = null;
 
@@ -462,6 +464,8 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       },
       onTextStyleChange: (patch) => {
         if (!state.currentRegionLabel) return;
+        if (typeof patch.x === "number") patch.x = clamp(patch.x, 0, 100);
+        if (typeof patch.y === "number") patch.y = clamp(patch.y, 0, 100);
         Object.assign(state.currentRegionLabel, patch);
         changesManager.upsert("regionLabel", state.currentRegionLabel.id, state.currentRegionLabel);
         renderRegionLabels();

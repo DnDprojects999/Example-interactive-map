@@ -595,12 +595,22 @@ body.edit-mode .archive-expanded-text {
   position: fixed;
   z-index: 90;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   align-items: center;
   padding: 8px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,.2);
   background: rgba(8,12,20,.92);
+}
+.map-text-toolbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.map-text-toolbar input[type="range"] {
+  width: 96px;
 }
 .map-text-toolbar button.active {
   background: rgba(255,255,255,.2);
