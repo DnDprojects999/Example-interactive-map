@@ -24,6 +24,7 @@ export function createMapModule(els, state, ui) {
   function applyMapTransform() {
     constrainMapOffsetToImageBounds();
     els.mapTransform.style.transform = `translate(${state.mapOffsetX}px, ${state.mapOffsetY}px) scale(${state.mapScale})`;
+    els.mapStage.style.setProperty("--overlay-scale-inverse", (1 / state.mapScale).toFixed(4));
     document.body.classList.toggle("zoom-near", state.mapScale >= 1.8);
     els.mapScaleIndicator.textContent = `x${state.mapScale.toFixed(2)}`;
   }
@@ -50,6 +51,7 @@ export function createMapModule(els, state, ui) {
     }, { passive: false });
 
     els.mapStage.addEventListener("pointerdown", (event) => {
+      if (event.button === 2) event.preventDefault();
       const isMarker = event.target.classList.contains("marker");
       if (isMarker) return;
 
@@ -85,6 +87,7 @@ export function createMapModule(els, state, ui) {
 
     els.mapStage.addEventListener("pointerup", stopPanning);
     els.mapStage.addEventListener("pointercancel", stopPanning);
+    els.mapStage.addEventListener("contextmenu", (event) => event.preventDefault());
   }
 
   function getMapPercentFromClient(clientX, clientY) {

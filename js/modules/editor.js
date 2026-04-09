@@ -68,6 +68,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     labelsButton.addEventListener("click", () => {
       if (state.editMode) {
         state.regionTextMode = !state.regionTextMode;
+        if (!state.regionTextMode) state.regionTextMoveMode = false;
         labelsButton.classList.toggle("active", state.regionTextMode);
         els.panelSubtitle.textContent = state.regionTextMode
           ? "Редактирование подписей территорий"
@@ -309,10 +310,11 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       el.style.fontWeight = label.bold ? "700" : "500";
       el.style.fontStyle = label.italic ? "italic" : "normal";
       el.style.color = label.color || "#dbeafe";
-      el.style.transform = `translate(-50%, -50%) rotate(${label.rotation || 0}deg)`;
+      el.style.transform = `translate(-50%, -50%) rotate(${label.rotation || 0}deg) scale(var(--overlay-scale-inverse, 1))`;
       el.textContent = label.text || "Новая подпись";
-      el.contentEditable = String(state.editMode && state.regionTextMode);
-      el.classList.toggle("text-editable", state.editMode && state.regionTextMode);
+      const textEditable = state.editMode && state.regionTextMode && !state.regionTextMoveMode;
+      el.contentEditable = String(textEditable);
+      el.classList.toggle("text-editable", textEditable);
 
       el.addEventListener("input", () => {
         label.text = el.textContent.trim();
@@ -375,12 +377,14 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     if (!state.editorGroupId && state.groupsData.length > 0) {
       state.editorGroupId = state.groupsData[0].id;
     }
-    if (!state.editMode) state.regionTextMode = false;
+    if (!state.editMode) {
+      state.regionTextMode = false;
+      state.regionTextMoveMode = false;
+    }
 
     els.exportDataButton.hidden = !state.editMode;
     els.uploadMapTextureButton.hidden = !state.editMode;
     els.deleteMarkerButton.hidden = !state.editMode;
-    els.drawLayerPanel.hidden = !state.editMode;
     els.addPaletteButton.hidden = !state.editMode;
     ui.setPanelEditable(state.editMode);
     ui.setMapEditorControlsVisible(state.editMode && !state.timelineMode && !state.archiveMode, state.drawMode);
@@ -395,7 +399,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     if (state.editMode) {
       els.panelSubtitle.textContent = "Режим редактирования включён";
       els.panelText.textContent =
-        "Клик по карте: новая метка · Alt+клик по метке: удалить · подписи: зажми 1 сек в текстовом режиме для перетаскивания.";
+        "Клик по карте: новая метка · Alt+клик по метке: удалить · подписи территорий: кнопка «↔ Перемещение текста» включает перетаскивание.";
     }
   }
 
@@ -428,6 +432,15 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
     renderDrawLayerPanel();
     ui.setupMapEditorCallbacks({
       onCreateRegionLabel: () => createRegionLabel(),
+      onToggleTextMoveMode: () => {
+        state.regionTextMode = true;
+        state.regionTextMoveMode = !state.regionTextMoveMode;
+        renderRegionLabels();
+        ui.setMapEditorControlsVisible(state.editMode && !state.timelineMode && !state.archiveMode, state.drawMode);
+        els.panelSubtitle.textContent = state.regionTextMoveMode
+          ? "Режим перемещения подписей включён"
+          : "Режим редактирования текста включён";
+      },
       onToggleDrawMode: () => {
         state.drawMode = !state.drawMode;
         ui.setMapEditorControlsVisible(state.editMode && !state.timelineMode && !state.archiveMode, state.drawMode);
@@ -515,9 +528,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       if (!label) return;
       state.currentRegionLabel = label;
 
-      const longPressDragDelayMs = 1000;
-      let dragEnabled = !state.regionTextMode;
-      let longPressTimerId = null;
+      const dragEnabled = !state.regionTextMode || state.regionTextMoveMode;
 
       const onMove = (moveEvent) => {
         if (!dragEnabled) return;
@@ -529,10 +540,6 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       };
 
       const releaseHandlers = () => {
-        if (longPressTimerId !== null) {
-          clearTimeout(longPressTimerId);
-          longPressTimerId = null;
-        }
         labelElement.removeEventListener("pointermove", onMove);
         labelElement.removeEventListener("pointerup", onEnd);
         labelElement.removeEventListener("pointercancel", onEnd);
@@ -548,12 +555,7 @@ export function createEditorModule(els, state, ui, mapModule, changesManager) {
       labelElement.addEventListener("pointerup", onEnd);
       labelElement.addEventListener("pointercancel", onEnd);
 
-      if (!state.regionTextMode) return;
-
-      ui.openMapTextToolbar(label, labelElement.getBoundingClientRect());
-      longPressTimerId = window.setTimeout(() => {
-        dragEnabled = true;
-      }, longPressDragDelayMs);
+      if (state.regionTextMode) ui.openMapTextToolbar(label, labelElement.getBoundingClientRect());
     });
 
     els.exportDataButton.addEventListener("click", exportWorldChangesJson);

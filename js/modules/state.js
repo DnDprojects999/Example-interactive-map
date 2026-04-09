@@ -20,6 +20,7 @@ export const state = {
   drawBrushSize: 2,
   regionLabelsVisible: true,
   regionTextMode: false,
+  regionTextMoveMode: false,
   timelineMode: false,
   archiveMode: false,
   activeArchiveGroupId: null,
