@@ -317,6 +317,8 @@ export function createUI(els, state) {
     els.mapTextSizeInput.value = String(label.fontSize || 36);
     els.mapTextColorInput.value = label.color || "#dbeafe";
     els.mapTextRotateInput.value = String(label.rotation || 0);
+    els.mapTextXInput.value = String(label.x ?? 50);
+    els.mapTextYInput.value = String(label.y ?? 50);
     els.mapTextBoldButton.classList.toggle("active", Boolean(label.bold));
     els.mapTextItalicButton.classList.toggle("active", Boolean(label.italic));
 
@@ -1021,6 +1023,12 @@ export function createUI(els, state) {
     });
     els.mapTextRotateInput.addEventListener("input", () => {
       mapEditorCallbacks.onTextStyleChange({ rotation: Number(els.mapTextRotateInput.value) || 0 });
+    });
+    els.mapTextXInput.addEventListener("input", () => {
+      mapEditorCallbacks.onTextStyleChange({ x: Number(els.mapTextXInput.value) || 0 });
+    });
+    els.mapTextYInput.addEventListener("input", () => {
+      mapEditorCallbacks.onTextStyleChange({ y: Number(els.mapTextYInput.value) || 0 });
     });
     els.mapTextBoldButton.addEventListener("click", () => {
       const next = !els.mapTextBoldButton.classList.contains("active");

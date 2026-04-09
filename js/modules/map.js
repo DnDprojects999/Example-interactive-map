@@ -1,8 +1,16 @@
 import { clamp } from "./state.js";
 
 export function createMapModule(els, state, ui) {
+  const FALLBACK_MIN_MAP_SCALE = 0.6;
+  const BASE_IMAGE_MIN_MAP_SCALE = 1;
+  const MAX_MAP_SCALE = 4;
+
   function hasBaseMapImage() {
     return Boolean(els.mapTransform.querySelector("#mapBaseImage, .map-base-image"));
+  }
+
+  function getMinMapScale() {
+    return hasBaseMapImage() ? BASE_IMAGE_MIN_MAP_SCALE : FALLBACK_MIN_MAP_SCALE;
   }
 
   function constrainMapOffsetToImageBounds() {
@@ -22,6 +30,7 @@ export function createMapModule(els, state, ui) {
   }
 
   function applyMapTransform() {
+    state.mapScale = clamp(state.mapScale, getMinMapScale(), MAX_MAP_SCALE);
     constrainMapOffsetToImageBounds();
     els.mapTransform.style.transform = `translate(${state.mapOffsetX}px, ${state.mapOffsetY}px) scale(${state.mapScale})`;
     els.mapStage.style.setProperty("--overlay-scale-inverse", (1 / state.mapScale).toFixed(4));
@@ -44,7 +53,7 @@ export function createMapModule(els, state, ui) {
       const worldY = (mouseY - state.mapOffsetY) / state.mapScale;
 
       const zoomFactor = event.deltaY < 0 ? 1.1 : 0.9;
-      state.mapScale = clamp(state.mapScale * zoomFactor, 0.6, 4);
+      state.mapScale = clamp(state.mapScale * zoomFactor, getMinMapScale(), MAX_MAP_SCALE);
 
       state.mapOffsetX = mouseX - worldX * state.mapScale;
       state.mapOffsetY = mouseY - worldY * state.mapScale;

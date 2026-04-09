@@ -53,6 +53,8 @@ export function getElements() {
     mapTextItalicButton: document.getElementById("mapTextItalicButton"),
     mapTextColorInput: document.getElementById("mapTextColorInput"),
     mapTextRotateInput: document.getElementById("mapTextRotateInput"),
+    mapTextXInput: document.getElementById("mapTextXInput"),
+    mapTextYInput: document.getElementById("mapTextYInput"),
     drawLayerPanel: document.getElementById("drawLayerPanel"),
     drawLayerList: document.getElementById("drawLayerList"),
     drawBrushSizeInput: document.getElementById("drawBrushSizeInput"),
