@@ -13,26 +13,18 @@ import {
 // Main map editor coordinator: marker layers, region labels, draw layers,
 // Active Map pinning, and edit-mode access rules all meet here.
 export function createEditorModule(els, state, ui, mapModule, changesManager) {
-  const EDITOR_ACCESS_STORAGE_KEY = "serkonia:editor-access";
-
   if (!state.mapTextureByType || typeof state.mapTextureByType !== "object") {
     state.mapTextureByType = {};
   }
 
   function hasEditorAccess() {
-    // Localhost is always trusted for convenience; deployed builds need either
-    // ?editor=1 or an already granted localStorage flag.
+    // Localhost is always trusted for convenience. Public editor access is a
+    // deliberate project-level opt-in from index.html.
     try {
       const hostname = window.location.hostname;
       const isLocalHost = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
       if (isLocalHost) return true;
-
-      const searchParams = new URLSearchParams(window.location.search);
-      const accessGrantedByQuery = searchParams.get("editor") === "1";
-      if (accessGrantedByQuery) {
-        window.localStorage?.setItem(EDITOR_ACCESS_STORAGE_KEY, "granted");
-      }
-      return accessGrantedByQuery || window.localStorage?.getItem(EDITOR_ACCESS_STORAGE_KEY) === "granted";
+      return window.SERKONIA_CONFIG?.publicEditorAccess === true;
     } catch (error) {
       return false;
     }

@@ -101,13 +101,36 @@ editor access is available automatically.
 
 ### On A Published Site
 
-Use:
+By default, editor mode is disabled for everyone on the published site.
 
-- `?editor=1`
+To enable it for all visitors, open [index.html](/F:/CODEX/Serkonia/index.html) and change:
 
-Example:
+```html
+window.SERKONIA_CONFIG = {
+  publicEditorAccess: false,
+};
+```
 
-- `https://yourname.github.io/repository-name/?editor=1`
+to:
+
+```html
+window.SERKONIA_CONFIG = {
+  publicEditorAccess: true,
+};
+```
+
+This is the simplest switch for people who fork the project and want to turn it
+into a fully browser-editable version for their own use.
+
+### Quick Note For New Users
+
+If someone just wants to use the site as a viewer for players:
+
+- keep `publicEditorAccess: false`
+
+If someone wants everyone who opens their published copy to be able to edit:
+
+- change it to `publicEditorAccess: true`
 
 Then press:
 
@@ -281,4 +304,3 @@ Example placeholders:
 - personal use allowed
 - forks allowed with credit
 - commercial use not allowed without permission
-
