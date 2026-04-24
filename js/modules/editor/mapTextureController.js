@@ -3,6 +3,7 @@ import {
   getMapViewLabel,
   getMapViewTextureKey,
 } from "../mapViews.js";
+import { getUiText } from "../uiLocale.js";
 
 export function createMapTextureController({
   els,
@@ -10,8 +11,6 @@ export function createMapTextureController({
   changesManager,
   readFileToDataUrl,
 }) {
-  // Map textures are stored by texture key, not by visible mode id. This lets
-  // multiple display modes intentionally share the same underlying image.
   function resolveTextureKeyByMode(mode = state.mapViewMode) {
     return getMapViewTextureKey(state.worldData, mode);
   }
@@ -28,12 +27,10 @@ export function createMapTextureController({
   function updateMapTextureButtonLabel() {
     const view = getMapViewConfig(state.worldData, state.mapViewMode);
     const modeLabel = getMapViewLabel(view, state, view.label || view.id);
-    els.uploadMapTextureButton.textContent = `Заливка для режима: ${modeLabel}`;
+    els.uploadMapTextureButton.textContent = getUiText(state, "upload_map_texture_for_mode", { mode: modeLabel });
   }
 
   async function handleMapTextureSelection(file) {
-    // Texture uploads are saved as mapTexture changes so they can travel through
-    // export/import alongside the rest of the project edits.
     if (!file || !file.type.startsWith("image/")) return;
 
     const textureKey = resolveTextureKeyByMode();
@@ -44,8 +41,11 @@ export function createMapTextureController({
 
     const view = getMapViewConfig(state.worldData, state.mapViewMode);
     const modeLabel = getMapViewLabel(view, state, view.label || view.id);
-    els.panelSubtitle.textContent = `Фон режима обновлён: ${modeLabel}`;
-    els.panelText.textContent = `Изображение "${file.name}" сохранено для режима "${modeLabel}".`;
+    els.panelSubtitle.textContent = getUiText(state, "upload_map_texture_updated_subtitle", { mode: modeLabel });
+    els.panelText.textContent = getUiText(state, "upload_map_texture_updated_text", {
+      file: file.name,
+      mode: modeLabel,
+    });
   }
 
   return {

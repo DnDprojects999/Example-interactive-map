@@ -32,19 +32,6 @@ function validateHomebrewJson(payload) {
   if (!Array.isArray(payload.articles)) throw new Error("homebrew.json: articles must be an array.");
 }
 
-function validateActiveMapJson(payload) {
-  if (!payload || typeof payload !== "object") throw new Error("active-map.json: invalid root object.");
-  if (payload.pinnedMarkerIds !== undefined && !Array.isArray(payload.pinnedMarkerIds)) {
-    throw new Error("active-map.json: pinnedMarkerIds must be an array.");
-  }
-  if (payload.markers !== undefined && !Array.isArray(payload.markers)) {
-    throw new Error("active-map.json: markers must be an array.");
-  }
-  if (payload.routes !== undefined && !Array.isArray(payload.routes)) {
-    throw new Error("active-map.json: routes must be an array.");
-  }
-}
-
 function validateWorldJson(payload) {
   if (!payload || typeof payload !== "object") throw new Error("world.json: invalid root object.");
 }
@@ -66,13 +53,14 @@ async function tryLoadOptionalChanges() {
     try {
       response = await fetch(path, { cache: "no-store" });
     } catch (error) {
-      // If the optional overlay is temporarily unavailable in the environment, the base content can still load.
+      // If the optional overlay is temporarily unavailable in the environment,
+      // the base content can still load.
       return null;
     }
 
     if (!response.ok) {
       if (response.status === 404) continue;
-      throw new Error(`РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ ${response.url} (${response.status})`);
+      throw new Error(`Failed to load ${response.url} (${response.status})`);
     }
 
     let payload;
@@ -87,29 +75,6 @@ async function tryLoadOptionalChanges() {
   }
 
   return null;
-}
-
-async function tryLoadOptionalActiveMap() {
-  let response;
-  try {
-    response = await fetch("data/active-map.json", { cache: "no-store" });
-  } catch (error) {
-    return { meta: {}, pinnedMarkerIds: [], markers: [], routes: [] };
-  }
-
-  if (!response.ok) {
-    if (response.status === 404) return { meta: {}, pinnedMarkerIds: [], markers: [], routes: [] };
-    throw new Error(`Failed to load ${response.url} (${response.status})`);
-  }
-
-  const payload = await response.json();
-  validateActiveMapJson(payload);
-  return {
-    meta: payload.meta && typeof payload.meta === "object" ? payload.meta : {},
-    pinnedMarkerIds: Array.isArray(payload.pinnedMarkerIds) ? payload.pinnedMarkerIds : [],
-    markers: Array.isArray(payload.markers) ? payload.markers : [],
-    routes: Array.isArray(payload.routes) ? payload.routes : [],
-  };
 }
 
 async function tryLoadOptionalWorld() {
@@ -174,20 +139,20 @@ async function tryLoadOptionalHomebrew() {
 // Startup consumes a clean base snapshot first and only then applies the
 // optional changes overlay, so import/export stays deterministic.
 export async function loadData() {
-  // Р—Р°РіСЂСѓР¶Р°РµРј РїР°СЂР°Р»Р»РµР»СЊРЅРѕ, С‡С‚РѕР±С‹ РјРёРЅРёРјРёР·РёСЂРѕРІР°С‚СЊ TTFI РїСЂРё СЃС‚Р°СЂС‚Рµ РїСЂРёР»РѕР¶РµРЅРёСЏ.
-  const [markersResponse, timelineResponse, archiveResponse, heroesResponse, activeMapData, worldData, homebrewData] = await Promise.all([
+  // Load the required datasets in parallel so the first render is not blocked
+  // by avoidable request waterfalls.
+  const [markersResponse, timelineResponse, archiveResponse, heroesResponse, worldData, homebrewData] = await Promise.all([
     fetch("data/markers.json"),
     fetch("data/timeline.json"),
     fetch("data/archive.json"),
     fetch("data/heroes.json"),
-    tryLoadOptionalActiveMap(),
     tryLoadOptionalWorld(),
     tryLoadOptionalHomebrew(),
   ]);
 
   [markersResponse, timelineResponse, archiveResponse, heroesResponse].forEach((response) => {
     if (!response.ok) {
-      throw new Error(`РќРµ СѓРґР°Р»РѕСЃСЊ Р·Р°РіСЂСѓР·РёС‚СЊ ${response.url} (${response.status})`);
+      throw new Error(`Failed to load ${response.url} (${response.status})`);
     }
   });
 
@@ -215,7 +180,6 @@ export async function loadData() {
     heroesData: heroesJson.groups || [],
     homebrewCategoriesData: homebrewData.categories || [],
     homebrewArticlesData: homebrewData.articles || [],
-    activeMapData,
     regionLabelsData: markersJson.regionLabels || [],
     drawLayersData: markersJson.drawLayers || [],
     mapTexturesData: markersJson.mapTextures && typeof markersJson.mapTextures === "object"

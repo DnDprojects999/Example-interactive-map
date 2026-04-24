@@ -66,7 +66,7 @@ function createHeroImage(hero, className, localizationContext) {
       hero,
       "imageLabel",
       localizationContext,
-      getLocalizedText(hero, "title", localizationContext, "Hero portrait"),
+      getLocalizedText(hero, "title", localizationContext, getUiText(localizationContext, "heroes_add_portrait")),
     );
     image.loading = "lazy";
     imageWrap.appendChild(image);
@@ -280,11 +280,8 @@ export function createHeroExpandedCard(hero, options) {
     linkButton.type = "button";
     linkButton.dataset.linkIndex = String(index);
     linkButton.textContent = link.label || getUiText(localizationContext, "heroes_related_record");
-    const editTitle = String(localizationContext?.currentLanguage || "") === "en"
-      ? "Click: open - Alt+click: remove link"
-      : "\u041a\u043b\u0438\u043a: \u043f\u0435\u0440\u0435\u0439\u0442\u0438 - Alt+\u043a\u043b\u0438\u043a: \u0443\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0432\u044f\u0437\u044c";
     linkButton.title = editMode
-      ? editTitle
+      ? getUiText(localizationContext, "heroes_link_edit_title")
       : getUiText(localizationContext, "heroes_link_navigate_title");
     linkButton.addEventListener("click", (event) => {
       if (editMode && event.altKey) return;

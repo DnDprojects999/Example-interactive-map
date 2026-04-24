@@ -1,9 +1,10 @@
-import {
+﻿import {
   DEFAULT_TIMELINE_SHORTCUTS,
   getDefaultTimelineShortcutLabel,
   getTimelineEventsForAct,
   getTimelineSidebarActions,
 } from "./timelineModel.js";
+import { getUiText } from "./uiLocale.js";
 
 export function createTimelineSidebarController(options) {
   const {
@@ -40,25 +41,25 @@ export function createTimelineSidebarController(options) {
   function addShortcut() {
     if (!state.editMode) return;
     const visibleEvents = getTimelineEventsForAct(state.eventsData, state.currentTimelineActId);
-    const shortcutEventIds = new Set(getTimelineSidebarActions(visibleEvents).map((action) => action.eventId));
+    const shortcutEventIds = new Set(getTimelineSidebarActions(visibleEvents, DEFAULT_TIMELINE_SHORTCUTS, state).map((action) => action.eventId));
     const candidates = visibleEvents.filter((event) => event?.id && !shortcutEventIds.has(event.id));
 
     if (candidates.length === 0) {
-      window.alert("Все события уже есть в левой панели.");
+      window.alert(getUiText(state, "timeline_sidebar_all_used"));
       return;
     }
 
     const list = candidates
-      .map((event, index) => `${index + 1}. ${event.year || "?"} - ${event.title || "Без названия"}`)
+      .map((event, index) => `${index + 1}. ${event.year || "?"} - ${event.title || getUiText(state, "timeline_sidebar_untitled")}`)
       .join("\n");
-    const selectedRaw = window.prompt(`Какое событие добавить в контрольные точки?\n${list}`, "1");
+    const selectedRaw = window.prompt(getUiText(state, "timeline_sidebar_pick_event", { list }), "1");
     if (!selectedRaw) return;
 
     const selectedEvent = candidates[Number(selectedRaw) - 1];
     if (!selectedEvent) return;
 
     const defaultLabel = getDefaultTimelineShortcutLabel(selectedEvent);
-    const label = window.prompt("Подпись кнопки в левой панели", defaultLabel);
+    const label = window.prompt(getUiText(state, "timeline_sidebar_button_label"), defaultLabel);
     if (label == null) return;
     setShortcut(selectedEvent.id, label);
   }
@@ -68,7 +69,10 @@ export function createTimelineSidebarController(options) {
     const event = state.eventsData.find((entry) => entry.id === action.eventId);
     if (!event) return;
 
-    const command = window.prompt("Новая подпись или '-' чтобы убрать точку", action.label || getDefaultTimelineShortcutLabel(event));
+    const command = window.prompt(
+      getUiText(state, "timeline_sidebar_new_label"),
+      action.label || getDefaultTimelineShortcutLabel(event),
+    );
     if (command == null) return;
 
     if (command.trim() === "-") {
@@ -88,14 +92,14 @@ export function createTimelineSidebarController(options) {
     // shortcuts change when acts switch or events are edited.
     els.toolButtonsContainer.innerHTML = "";
 
-    const actions = getTimelineSidebarActions(getTimelineEventsForAct(state.eventsData, state.currentTimelineActId));
+    const actions = getTimelineSidebarActions(getTimelineEventsForAct(state.eventsData, state.currentTimelineActId), DEFAULT_TIMELINE_SHORTCUTS, state);
     actions.forEach((action) => {
       const button = document.createElement("button");
       button.className = `tool-btn active timeline-shortcut ${state.editMode && !action.isDefault ? "timeline-shortcut-editable" : ""}`;
       button.dataset.label = action.title;
       button.textContent = action.label;
       button.title = state.editMode && !action.isDefault
-        ? `${action.title}\nПравый клик: переименовать или убрать`
+        ? `${action.title}\n${getUiText(state, "timeline_sidebar_context_hint")}`
         : action.title;
       button.addEventListener("click", () => scrollToEvent(action.eventId));
       button.addEventListener("contextmenu", (event) => {
@@ -114,9 +118,9 @@ export function createTimelineSidebarController(options) {
     if (state.editMode) {
       const addButton = document.createElement("button");
       addButton.className = "tool-btn timeline-shortcut-add";
-      addButton.dataset.label = "Добавить контрольную точку";
+      addButton.dataset.label = getUiText(state, "timeline_sidebar_add_point");
       addButton.textContent = "+";
-      addButton.title = "Добавить контрольную точку таймлайна";
+      addButton.title = getUiText(state, "timeline_sidebar_add_point_title");
       addButton.addEventListener("click", addShortcut);
       els.toolButtonsContainer.appendChild(addButton);
     }
@@ -134,7 +138,7 @@ export function createTimelineSidebarController(options) {
       event.sidebarShortcutLabel = "";
     } else {
       const defaultLabel = getDefaultTimelineShortcutLabel(event);
-      const nextLabel = window.prompt("Подпись быстрой точки", defaultLabel);
+      const nextLabel = window.prompt(getUiText(state, "timeline_sidebar_quick_label"), defaultLabel);
       if (nextLabel == null) return;
       event.sidebarShortcut = true;
       event.sidebarShortcutLabel = (nextLabel.trim() || defaultLabel).slice(0, 8);

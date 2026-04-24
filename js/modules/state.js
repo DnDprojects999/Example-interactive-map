@@ -1,10 +1,16 @@
 import { DEFAULT_WORLD_INFO } from "./worldInfo.js";
+import { DEFAULT_SITE_THEME_ID } from "./siteThemes.js";
 
 // This is the shared client-side state tree for the whole app. Feature modules
 // read and write here, while renderers decide which parts should be visible.
 export const state = {
   currentSlide: 0,
   currentPalette: "ember",
+  currentPaletteByGroup: {
+    default: "ember",
+    "serkonia-command": "blue",
+  },
+  currentSiteTheme: DEFAULT_SITE_THEME_ID,
   customPalettes: [],
   worldData: {
     ...DEFAULT_WORLD_INFO,
@@ -22,12 +28,6 @@ export const state = {
   heroesData: [],
   homebrewCategoriesData: [],
   homebrewArticlesData: [],
-  activeMapData: {
-    meta: {},
-    pinnedMarkerIds: [],
-    markers: [],
-    routes: [],
-  },
   regionLabelsData: [],
   drawLayersData: [],
 
@@ -52,7 +52,6 @@ export const state = {
   archiveMode: false,
   heroesMode: false,
   homebrewMode: false,
-  activeMapMode: false,
   activeArchiveGroupId: null,
   activeHeroGroupId: null,
   currentHomebrewArticleId: null,
@@ -62,8 +61,6 @@ export const state = {
   currentHomebrewCategoryId: "all",
   currentHomebrewType: "change",
   homebrewSearchQuery: "",
-  activeMapTool: "marker",
-  activeMapShowAllMarkers: false,
   mapViewMode: "author",
   mapTextureByType: {
   },

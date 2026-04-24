@@ -1,4 +1,5 @@
 import { getLocalizedText } from "../localization.js";
+import { getUiText } from "../uiLocale.js";
 
 // Archive supports per-map-mode image variants so the same card can show
 // different art in author/vector-style presentations.
@@ -45,13 +46,18 @@ export function renderArchiveCardImage(imageNode, item, mapViewMode, localizatio
   imageNode.innerHTML = "";
   const imageUrl = getArchiveItemImageUrl(item, mapViewMode);
   if (!imageUrl) {
-    imageNode.textContent = getLocalizedText(item, "imageLabel", localizationContext, "Изображение");
+    imageNode.textContent = getLocalizedText(item, "imageLabel", localizationContext, getUiText(localizationContext, "archive_image_fallback"));
     return;
   }
 
   appendImagePreview(imageNode, {
     src: imageUrl,
-    alt: getLocalizedText(item, "imageLabel", localizationContext, getLocalizedText(item, "title", localizationContext, "Иллюстрация карточки архива")),
+    alt: getLocalizedText(
+      item,
+      "imageLabel",
+      localizationContext,
+      getLocalizedText(item, "title", localizationContext, getUiText(localizationContext, "archive_card_illustration")),
+    ),
     className: "archive-card-image-preview",
   });
 }
@@ -64,7 +70,7 @@ export function renderArchiveExpandedImage(imageNode, item, mapViewMode, localiz
       item,
       "expandedImageLabel",
       localizationContext,
-      getLocalizedText(item, "imageLabel", localizationContext, "Картинка раскрытия"),
+      getLocalizedText(item, "imageLabel", localizationContext, getUiText(localizationContext, "archive_image_fallback")),
     );
     return;
   }
@@ -75,7 +81,12 @@ export function renderArchiveExpandedImage(imageNode, item, mapViewMode, localiz
       item,
       "expandedImageLabel",
       localizationContext,
-      getLocalizedText(item, "imageLabel", localizationContext, getLocalizedText(item, "title", localizationContext, "Раскрытая иллюстрация карточки архива")),
+      getLocalizedText(
+        item,
+        "imageLabel",
+        localizationContext,
+        getLocalizedText(item, "title", localizationContext, getUiText(localizationContext, "archive_expanded_illustration")),
+      ),
     ),
     className: "archive-expanded-image",
   });

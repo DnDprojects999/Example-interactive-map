@@ -1,10 +1,10 @@
+import { getLocalizedText } from "../localization.js";
+
 function normalizeText(value, fallback = "") {
   const normalized = String(value || "").trim();
   return normalized || fallback;
 }
 
-// Roster helpers translate flexible stored player data into a consistent shape
-// that the player sidebar and heroes pages can rely on.
 function findHeroGroupId(heroesData, heroId) {
   for (const group of Array.isArray(heroesData) ? heroesData : []) {
     if ((group.items || []).some((hero) => hero.id === heroId)) return group.id;
@@ -34,8 +34,6 @@ function normalizeCharacterReference(reference, heroesData) {
 }
 
 export function normalizePlayerRecord(rawValue, heroesData, fallbackId = "") {
-  // Older saves may store hero references under different field names, so we
-  // normalize them all into one characters[] format here.
   const player = rawValue && typeof rawValue === "object" ? rawValue : {};
   const name = normalizeText(player.name);
   if (!name) return null;
@@ -53,6 +51,9 @@ export function normalizePlayerRecord(rawValue, heroesData, fallbackId = "") {
     name,
     label: normalizeText(player.label),
     notes: normalizeText(player.notes),
+    translations: player.translations && typeof player.translations === "object"
+      ? structuredClone(player.translations)
+      : {},
     characters: rawCharacters
       .map((entry) => normalizeCharacterReference(entry, heroesData))
       .filter(Boolean),
@@ -78,8 +79,7 @@ export function getPlayersForHero(playersData, groupId, heroId) {
     ));
 }
 
-export function resolvePlayerCharacters(player, heroesData) {
-  // Resolve lightweight hero references into labels the roster UI can display.
+export function resolvePlayerCharacters(player, heroesData, localizationContext = null) {
   const resolved = [];
 
   for (const character of player?.characters || []) {
@@ -91,9 +91,9 @@ export function resolvePlayerCharacters(player, heroesData) {
     resolved.push({
       id: hero.id,
       groupId: group.id,
-      title: hero.title || "Герой",
-      role: hero.role || "",
-      groupTitle: group.title || "Hall of Heroes",
+      title: getLocalizedText(hero, "title", localizationContext, "Hero"),
+      role: getLocalizedText(hero, "role", localizationContext, ""),
+      groupTitle: getLocalizedText(group, "title", localizationContext, "Hall of Heroes"),
     });
   }
 

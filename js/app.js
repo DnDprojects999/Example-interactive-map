@@ -5,14 +5,22 @@ import { createUI } from "./modules/ui.js";
 import { createMapModule } from "./modules/map.js";
 import { createEditorModule } from "./modules/editor.js";
 import { applyChanges, createChangesManager, validateChangesPayload } from "./modules/changes.js";
-import { createActiveMapController } from "./modules/activeMapController.js";
 import { setupTimelineScrollControls } from "./modules/timelineScroll.js";
 import { createCompactTopbarMenusController } from "./modules/app/compactTopbarMenus.js";
 import { createLanguageSwitcherController } from "./modules/app/languageSwitcher.js";
 import { createLoadingScreenAdminController } from "./modules/app/loadingScreenAdminController.js";
 import { createMapViewAdminController } from "./modules/app/mapViewAdminController.js";
+import { createTechConsoleController } from "./modules/app/techConsoleController.js";
+import { createAudioManager } from "./modules/audio/audioManager.js";
 import { createHomebrewController } from "./modules/homebrew/homebrewController.js";
-import { DEFAULT_WORLD_INFO, renameWorldInfo, resolveWorldInfoForLanguage } from "./modules/worldInfo.js";
+import { applySiteTheme, BUILTIN_SITE_THEMES, DEFAULT_SITE_THEME_ID, getSiteThemeLabel } from "./modules/siteThemes.js";
+import {
+  DEFAULT_SECTION_VISIBILITY,
+  DEFAULT_WORLD_INFO,
+  normalizeSectionVisibility,
+  renameWorldInfo,
+  resolveWorldInfoForLanguage,
+} from "./modules/worldInfo.js";
 import {
   getLanguageLabel,
   getLanguages,
@@ -25,6 +33,13 @@ import { applyUiLocale, getLoadingFlavorLines, getUiText } from "./modules/uiLoc
 const MIN_LOADING_SCREEN_MS = 2400;
 const LOADING_MESSAGE_ROTATE_MS = 1350;
 const USER_LANGUAGE_STORAGE_KEY = "serkonia:user-language";
+const DEFAULT_FAVICON_URL = "assets/favicon.svg";
+const OPTIONAL_SECTION_BUTTONS = Object.freeze({
+  timeline: "timelineOpenButton",
+  archive: "archiveOpenButton",
+  homebrew: "homebrewOpenButton",
+  heroes: "heroesOpenButton",
+});
 
 // Build the rotating loading-screen lines from world settings first and
 // fall back to UI locale defaults when the project does not provide custom copy.
@@ -37,7 +52,10 @@ function buildLoadingFlavorLines(worldInfo) {
 
 function applyWorldBranding(els, worldInfo, currentLanguage = worldInfo.defaultLanguage) {
   const localizedWorldInfo = resolveWorldInfoForLanguage(worldInfo, currentLanguage);
+  state.currentSiteTheme = localizedWorldInfo.siteThemeId || DEFAULT_SITE_THEME_ID;
+  applySiteTheme(document.body, localizedWorldInfo);
   document.title = localizedWorldInfo.appTitle;
+  applyFavicon(localizedWorldInfo.faviconUrl || worldInfo?.faviconUrl || DEFAULT_FAVICON_URL);
   document.documentElement.lang = resolveLanguage(worldInfo, currentLanguage);
   els.brandMain.textContent = localizedWorldInfo.name;
   els.loadingKicker.textContent = localizedWorldInfo.loadingKicker;
@@ -52,6 +70,20 @@ function applyWorldBranding(els, worldInfo, currentLanguage = worldInfo.defaultL
   if (!state.currentMarker) {
     els.panelTitle.textContent = localizedWorldInfo.panelTitle;
   }
+}
+
+function applyFavicon(source) {
+  const href = String(source || "").trim() || DEFAULT_FAVICON_URL;
+  let link = document.querySelector('link[rel="icon"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    document.head.appendChild(link);
+  }
+  link.href = href;
+  link.type = href.startsWith("data:image/")
+    ? (href.slice(5, href.indexOf(";")) || "image/png")
+    : "image/svg+xml";
 }
 
 // The loading experience is intentionally isolated from the rest of startup.
@@ -198,12 +230,13 @@ let mapModule;
 let changesManager;
 let editor;
 let loadingExperience;
-let activeMapController;
 let languageSwitcher;
 let compactTopbarMenus;
 let mapViewAdmin;
 let loadingScreenAdmin;
+let audioManager;
 let homebrewController;
+let techConsoleController;
 let panelEditableFields = [];
 
 // The shell wires together every major module once the base DOM and base data
@@ -213,7 +246,15 @@ function initializeAppShell() {
   els = getElements();
   applyUiLocale(els, state);
   applyWorldBranding(els, state.worldData, state.currentLanguage);
+  renderSiteThemePicker();
+  setTopbarTechReadout(null);
 
+  techConsoleController = createTechConsoleController({
+    els,
+    state,
+    resolveWorldName: () => resolveWorldInfoForLanguage(state.worldData, state.currentLanguage)?.name || DEFAULT_WORLD_INFO.name,
+    formatToken: formatTopbarReadoutToken,
+  });
   ui = createUI(els, state);
   mapModule = createMapModule(els, state, ui);
   changesManager = createChangesManager();
@@ -240,6 +281,11 @@ function initializeAppShell() {
     previewLoadingScreen: () => loadingExperience.preview(),
   });
   loadingScreenAdmin.setup?.();
+  audioManager = createAudioManager({
+    els,
+    state,
+    persistWorldInfo,
+  });
   homebrewController = createHomebrewController({
     els,
     state,
@@ -252,18 +298,8 @@ function initializeAppShell() {
     },
   });
   compactTopbarMenus = createCompactTopbarMenusController({ els, state });
-  activeMapController = createActiveMapController({
-    els,
-    state,
-    mapModule,
-    openMarkerInPanel: ui.updatePanelFromActiveMarker,
-    renderBaseMarkers: editor.renderMarkers,
-    refreshEditorButtons: ui.refreshEditorActionButtons,
-  });
-
   assertModuleApi("ui", ui, [
     "setSidebarRenderers",
-    "setActiveMapController",
     "setHomebrewController",
     "setupMapEditorCallbacks",
     "setChangeRecorder",
@@ -282,17 +318,14 @@ function initializeAppShell() {
     "openHomebrewMode",
     "openMapMode",
     "openHeroesMode",
-    "openActiveMapMode",
     "openMapTextToolbar",
     "closeMapTextToolbar",
     "setMapEditorControlsVisible",
     "savePanelToCurrentMarker",
     "updatePanelFromMarker",
-    "updatePanelFromActiveMarker",
     "updatePanelFromTimelineEvent",
     "renderHomebrew",
     "renderHeroes",
-    "renderActiveMap",
     "refreshTopbarActionButtons",
     "rerenderCurrentMode",
   ]);
@@ -310,7 +343,6 @@ function initializeAppShell() {
     mapButtonsRenderer: editor.renderGroups,
     mapMarkersRenderer: editor.renderMarkers,
   });
-  ui.setActiveMapController(activeMapController);
   ui.setHomebrewController(homebrewController);
   ui.setChangeRecorder({
     upsert: (entity, id, value, extra) => changesManager.upsert(entity, id, value, extra),
@@ -378,6 +410,180 @@ function persistWorldInfo() {
   changesManager.upsert("worldInfo", "world", state.worldData);
   syncLocalizedUi();
   syncMapViewEditorButtons();
+}
+
+function getSectionVisibility() {
+  return normalizeSectionVisibility(state.worldData?.sectionVisibility);
+}
+
+function getCurrentSectionKey() {
+  if (state.timelineMode) return "timeline";
+  if (state.archiveMode) return "archive";
+  if (state.homebrewMode) return "homebrew";
+  if (state.heroesMode) return "heroes";
+  return "";
+}
+
+function isSectionVisibleForCurrentAudience(sectionKey) {
+  if (state.editMode) return true;
+  return getSectionVisibility()[sectionKey] !== false;
+}
+
+function setSectionVisibilityPanelOpen(open) {
+  if (!els.sectionVisibilityPanel || !els.sectionVisibilityToggleButton) return;
+  const expanded = Boolean(open && state.editMode);
+  els.sectionVisibilityPanel.hidden = !expanded;
+  els.sectionVisibilityToggleButton.setAttribute("aria-expanded", expanded ? "true" : "false");
+}
+
+function syncSectionVisibilityControls() {
+  if (!els.sectionVisibilityDrawer) return;
+  const visibility = getSectionVisibility();
+  els.sectionVisibilityDrawer.hidden = !state.editMode;
+  if (!state.editMode) setSectionVisibilityPanelOpen(false);
+
+  Object.entries(OPTIONAL_SECTION_BUTTONS).forEach(([sectionKey, elementKey]) => {
+    const button = els[elementKey];
+    if (button) button.hidden = !state.editMode && visibility[sectionKey] === false;
+  });
+
+  const inputs = els.sectionVisibilityOptions?.querySelectorAll?.("[data-section-visibility]") || [];
+  inputs.forEach((input) => {
+    input.checked = visibility[input.dataset.sectionVisibility] !== false;
+  });
+}
+
+function updateSectionVisibility(sectionKey, visible) {
+  if (!Object.prototype.hasOwnProperty.call(DEFAULT_SECTION_VISIBILITY, sectionKey)) return;
+  state.worldData.sectionVisibility = {
+    ...getSectionVisibility(),
+    [sectionKey]: Boolean(visible),
+  };
+  persistWorldInfo();
+}
+
+function setupSectionVisibilityControls() {
+  if (!els.sectionVisibilityDrawer) return;
+
+  els.sectionVisibilityToggleButton?.addEventListener("click", () => {
+    setSectionVisibilityPanelOpen(els.sectionVisibilityPanel?.hidden !== false);
+  });
+
+  els.sectionVisibilityOptions?.addEventListener("change", (event) => {
+    const input = event.target?.closest?.("[data-section-visibility]");
+    if (!input) return;
+    updateSectionVisibility(input.dataset.sectionVisibility, input.checked);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (els.sectionVisibilityDrawer.hidden || els.sectionVisibilityDrawer.contains(event.target)) return;
+    setSectionVisibilityPanelOpen(false);
+  });
+}
+
+function readFileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(reader.error || new Error("Failed to read file."));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadFaviconFromEditor(file) {
+  if (!state.editMode || !file || !String(file.type || "").startsWith("image/")) return;
+  const dataUrl = await readFileToDataUrl(file);
+  state.worldData.faviconUrl = dataUrl;
+  persistWorldInfo();
+  els.panelSubtitle.textContent = getUiText(state, "upload_favicon_updated_subtitle");
+  els.panelText.textContent = getUiText(state, "upload_favicon_updated_text", { file: file.name });
+}
+
+function setSiteTheme(themeId) {
+  const nextThemeId = BUILTIN_SITE_THEMES.some((theme) => theme.id === themeId) ? themeId : DEFAULT_SITE_THEME_ID;
+  state.worldData.siteThemeId = nextThemeId;
+  state.currentSiteTheme = nextThemeId;
+  toggleSiteThemePopover(false);
+  persistWorldInfo();
+}
+
+function renderSiteThemePicker() {
+  if (!els?.editorThemeButton || !els?.editorThemeButtonLabel || !els?.editorThemeOptions) return;
+
+  const currentThemeId = state.worldData?.siteThemeId || state.currentSiteTheme || DEFAULT_SITE_THEME_ID;
+  const currentThemeLabel = getSiteThemeLabel(currentThemeId, state.currentLanguage);
+  const buttonTitle = getUiText(state, "editor_theme_button_title");
+
+  els.editorThemeButtonLabel.textContent = getUiText(state, "editor_theme_button", { theme: currentThemeLabel });
+  els.editorThemeButton.title = buttonTitle;
+  els.editorThemeButton.setAttribute("aria-label", buttonTitle);
+  if (els.editorThemeTitle) {
+    els.editorThemeTitle.textContent = getUiText(state, "editor_theme_title");
+  }
+
+  const optionNodes = BUILTIN_SITE_THEMES.map((theme) => {
+    const button = document.createElement("button");
+    const label = document.createElement("span");
+    const mark = document.createElement("span");
+    const isActive = theme.id === currentThemeId;
+
+    button.type = "button";
+    button.className = `editor-theme-option${isActive ? " active" : ""}`;
+    button.dataset.siteThemeOption = theme.id;
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+
+    label.className = "editor-theme-option-name";
+    label.textContent = getSiteThemeLabel(theme.id, state.currentLanguage);
+
+    mark.className = "editor-theme-option-mark";
+    mark.textContent = isActive ? "\u2713" : "";
+    mark.setAttribute("aria-hidden", "true");
+
+    button.append(label, mark);
+    return button;
+  });
+
+  els.editorThemeOptions.replaceChildren(...optionNodes);
+}
+
+function toggleSiteThemePopover(force) {
+  if (!els?.editorThemePopover || !els?.editorThemeButton) return;
+
+  const shouldOpen = typeof force === "boolean" ? force : els.editorThemePopover.hidden;
+  els.editorThemePopover.hidden = !shouldOpen;
+  els.editorThemeButton.setAttribute("aria-expanded", shouldOpen ? "true" : "false");
+  if (shouldOpen) renderSiteThemePicker();
+}
+
+function formatTopbarReadoutToken(rawValue) {
+  return String(rawValue || "")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+    .replace(/[-_]+/g, " ")
+    .replace(/\b(Button|Input|Popover|Panel|Toggle|Label|Menu|Link|Wrap|Open)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .split(" ")
+    .filter(Boolean)
+    .map((token) => token.toUpperCase())
+    .slice(0, 3)
+    .join(".");
+}
+
+function setTopbarTechReadout(source) {
+  if (!els?.topbarTechReadout) return;
+
+  if (!source) {
+    els.topbarTechReadout.textContent = "SYS//READY";
+    return;
+  }
+
+  const candidate = source.dataset?.techLabel
+    || (source.id ? formatTopbarReadoutToken(source.id) : "")
+    || formatTopbarReadoutToken(source.getAttribute?.("aria-label"))
+    || formatTopbarReadoutToken(source.title)
+    || formatTopbarReadoutToken(source.textContent);
+
+  els.topbarTechReadout.textContent = candidate ? `SYS//${candidate}` : "SYS//READY";
 }
 
 function toggleMapViewSwitcherVisibility() {
@@ -469,14 +675,18 @@ function syncLocalizedUi() {
   persistCurrentLanguage(state.currentLanguage);
   applyUiLocale(els, state);
   applyWorldBranding(els, state.worldData, state.currentLanguage);
+  ui?.syncPaletteTheme?.();
+  renderSiteThemePicker();
+  setTopbarTechReadout(null);
+  techConsoleController?.syncThemeState?.();
   loadingExperience.setWorldInfo(state.worldData);
   languageSwitcher.render();
   syncMapViewEditorButtons();
+  syncSectionVisibilityControls();
+  audioManager?.syncUi?.();
   ui.rerenderCurrentMode();
 
-  if (state.currentPanelEntity?.entity === "activeMarker" && state.currentMarker) {
-    ui.updatePanelFromActiveMarker(state.currentMarker);
-  } else if (state.currentPanelEntity?.entity === "timelineEvent" && state.currentTimelineEvent) {
+  if (state.currentPanelEntity?.entity === "timelineEvent" && state.currentTimelineEvent) {
     ui.updatePanelFromTimelineEvent(state.currentTimelineEvent);
   } else if (state.currentMarker) {
     ui.updatePanelFromMarker(state.currentMarker);
@@ -553,12 +763,6 @@ function removeLanguageLayer(languageCode) {
     });
   });
 
-  ((state.activeMapData?.markers) || []).forEach((marker) => {
-    if (pruneLanguageTranslation(marker, normalizedCode)) {
-      changesManager.upsert("activeMarker", marker.id, marker);
-    }
-  });
-
   (state.homebrewCategoriesData || []).forEach((category) => {
     if (pruneLanguageTranslation(category, normalizedCode)) {
       changesManager.upsert("homebrewCategory", category.id, category);
@@ -587,6 +791,7 @@ function removeLanguageLayer(languageCode) {
 function hydrateStateFromData(data) {
   state.baseDataSnapshot = data.baseData ? cloneValue(data.baseData) : state.baseDataSnapshot;
   state.worldData = data.worldData || state.worldData;
+  state.currentSiteTheme = state.worldData?.siteThemeId || DEFAULT_SITE_THEME_ID;
   const persistedLanguage = readPersistedLanguage();
   state.currentLanguage = resolveLanguage(
     state.worldData,
@@ -601,7 +806,6 @@ function hydrateStateFromData(data) {
   state.heroesData = data.heroesData;
   state.homebrewCategoriesData = data.homebrewCategoriesData || [];
   state.homebrewArticlesData = data.homebrewArticlesData || [];
-  state.activeMapData = data.activeMapData;
   state.regionLabelsData = data.regionLabelsData || [];
   state.drawLayersData = data.drawLayersData || [];
   state.mapTextureByType = data.mapTexturesData && typeof data.mapTexturesData === "object"
@@ -638,12 +842,13 @@ function renderInitialViews() {
   ui.renderTimeline();
   ui.renderHeroes();
   ui.renderHomebrew();
-  ui.renderActiveMap();
 }
 
 function setupTopLevelInteractions() {
   compactTopbarMenus.setup();
   languageSwitcher.setup();
+  audioManager?.setup?.();
+  techConsoleController?.setup?.();
   els.panelHandle.addEventListener("click", () => ui.togglePanel());
   els.deleteMarkerButton.addEventListener("click", () => editor.deleteCurrentMarker());
   if (els.toggleLanguageVisibilityButton) {
@@ -663,6 +868,40 @@ function setupTopLevelInteractions() {
     if (!palette) return;
     ui.setPalette(palette);
     ui.togglePalettePopover(false);
+  });
+
+  els.editorThemeButton?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    if (!state.editMode) return;
+    toggleSiteThemePopover();
+  });
+
+  els.editorThemePopover?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-site-theme-option]");
+    if (!button) return;
+    event.stopPropagation();
+    setSiteTheme(button.dataset.siteThemeOption);
+  });
+
+  els.topbar?.addEventListener("mouseover", (event) => {
+    const interactive = event.target.closest("button, input, select, [role='button']");
+    if (!interactive || !els.topbar.contains(interactive)) return;
+    setTopbarTechReadout(interactive);
+  });
+
+  els.topbar?.addEventListener("focusin", (event) => {
+    const interactive = event.target.closest("button, input, select, [role='button']");
+    if (!interactive || !els.topbar.contains(interactive)) return;
+    setTopbarTechReadout(interactive);
+  });
+
+  els.topbar?.addEventListener("mouseleave", () => {
+    setTopbarTechReadout(null);
+  });
+
+  els.topbar?.addEventListener("focusout", (event) => {
+    if (els.topbar.contains(event.relatedTarget)) return;
+    setTopbarTechReadout(null);
   });
 
   els.toggleMapViewSwitcherButton?.addEventListener("click", () => {
@@ -692,9 +931,64 @@ function setupTopLevelInteractions() {
     if (!state.editMode) return;
     await loadingScreenAdmin?.preview();
   });
+  els.uploadLoadingScreenImageButton?.addEventListener("click", () => {
+    if (!state.editMode) return;
+    loadingScreenAdmin?.promptImageUpload?.();
+  });
+  els.uploadFaviconButton?.addEventListener("click", () => {
+    if (!state.editMode) return;
+    els.faviconInput.click();
+  });
+  els.faviconInput?.addEventListener("change", async (event) => {
+    const [file] = Array.from(event.target.files || []);
+    await uploadFaviconFromEditor(file);
+    els.faviconInput.value = "";
+  });
+
+  const proxyEditorAction = (proxyElement, targetElement, options = {}) => {
+    proxyElement?.addEventListener("click", async () => {
+      if (!state.editMode) return;
+      if (typeof options.beforeClick === "function") options.beforeClick();
+      if (!targetElement || (!options.allowHidden && targetElement.hidden)) return;
+      if (typeof options.invoke === "function") {
+        await options.invoke(targetElement);
+        return;
+      }
+      targetElement.click();
+    });
+  };
+
+  proxyEditorAction(els.editorManageMapViewsButton, els.editMapViewsButton, {
+    beforeClick: () => compactTopbarMenus.close(),
+  });
+  proxyEditorAction(els.editorToggleMapViewSwitcherButton, els.toggleMapViewSwitcherButton, {
+    beforeClick: () => compactTopbarMenus.close(),
+  });
+  proxyEditorAction(els.editorUploadMapTextureButton, els.uploadMapTextureButton, {
+    beforeClick: () => compactTopbarMenus.close(),
+  });
+  proxyEditorAction(els.editorExportDataButton, els.exportDataButton, {
+    beforeClick: () => compactTopbarMenus.close(),
+  });
+  proxyEditorAction(els.editorImportDataButton, els.importDataButton, {
+    beforeClick: () => compactTopbarMenus.close(),
+    invoke: () => els.importDataInput.click(),
+  });
+  proxyEditorAction(els.editorLegendButton, els.sidebarLegendEditButton, { allowHidden: true });
+  proxyEditorAction(els.editorAddTimelineActButton, els.addTimelineActButton);
+  proxyEditorAction(els.editorEditTimelineActButton, els.editTimelineActButton);
+  proxyEditorAction(els.editorDeleteTimelineActButton, els.deleteTimelineActButton);
+  proxyEditorAction(els.editorTimelineBackdropButton, els.timelineActImageButton);
+  proxyEditorAction(els.editorAddHomebrewCategoryButton, els.addHomebrewCategoryButton);
+  proxyEditorAction(els.editorAddHomebrewArticleButton, els.addHomebrewArticleButton);
+  proxyEditorAction(els.heroesAddHeroGroupButton, els.addHeroGroupButton);
+  proxyEditorAction(els.heroesAddHeroCardButton, els.addHeroCardButton);
 
   document.addEventListener("click", (event) => {
     if (!els.paletteWidget.contains(event.target)) ui.togglePalettePopover(false);
+    if (els.editorThemePicker && !els.editorThemePicker.contains(event.target)) {
+      toggleSiteThemePopover(false);
+    }
     if (
       els.sidebarLegendPanel.contains(event.target)
       || els.sidebarLegendToggle.contains(event.target)
@@ -705,9 +999,16 @@ function setupTopLevelInteractions() {
   document.addEventListener("serkonia:edit-mode-changed", () => {
     languageSwitcher.render();
     syncMapViewEditorButtons();
+    syncSectionVisibilityControls();
+    if (!state.editMode) {
+      toggleSiteThemePopover(false);
+      const activeSection = getCurrentSectionKey();
+      if (activeSection && !isSectionVisibleForCurrentAudience(activeSection)) ui.openMapMode();
+    }
   });
 
   els.timelineOpenButton.addEventListener("click", () => {
+    if (!isSectionVisibleForCurrentAudience("timeline")) return;
     if (state.timelineMode || state.archiveMode || state.homebrewMode) {
       ui.openMapMode();
       return;
@@ -716,6 +1017,7 @@ function setupTopLevelInteractions() {
   });
 
   els.archiveOpenButton.addEventListener("click", () => {
+    if (!isSectionVisibleForCurrentAudience("archive")) return;
     if (state.archiveMode) {
       ui.openMapMode();
       return;
@@ -723,6 +1025,7 @@ function setupTopLevelInteractions() {
     ui.openArchiveMode();
   });
   els.homebrewOpenButton.addEventListener("click", () => {
+    if (!isSectionVisibleForCurrentAudience("homebrew")) return;
     if (state.homebrewMode) {
       ui.openMapMode();
       return;
@@ -730,15 +1033,11 @@ function setupTopLevelInteractions() {
     ui.openHomebrewMode();
   });
 
-  els.heroesOpenButton.addEventListener("click", () => ui.openHeroesMode());
-  els.renameWorldButton.addEventListener("click", renameWorldFromEditor);
-  els.activeMapToggleButton.addEventListener("click", () => {
-    if (state.activeMapMode) {
-      ui.openMapMode();
-      return;
-    }
-    ui.openActiveMapMode();
+  els.heroesOpenButton.addEventListener("click", () => {
+    if (!isSectionVisibleForCurrentAudience("heroes")) return;
+    ui.openHeroesMode();
   });
+  els.renameWorldButton.addEventListener("click", renameWorldFromEditor);
   els.heroesHomeButton.addEventListener("click", () => ui.openMapMode());
   els.mapReturnButton.addEventListener("click", () => ui.openMapMode());
   els.importDataButton.addEventListener("click", () => {
@@ -747,8 +1046,6 @@ function setupTopLevelInteractions() {
   });
   els.uploadMapTextureButton.addEventListener("click", () => compactTopbarMenus.close());
   els.exportDataButton.addEventListener("click", () => compactTopbarMenus.close());
-  els.exportActiveMapButton.addEventListener("click", () => compactTopbarMenus.close());
-
   setupTimelineScrollControls(els);
   panelEditableFields.forEach((element) => element.addEventListener("input", ui.savePanelToCurrentMarker));
 }
@@ -816,36 +1113,37 @@ async function bootstrap() {
   try {
     initializeAppShell();
 
-ui.setPalette(state.currentPalette);
-ui.togglePalettePopover(false);
-ui.setPanelEditable(false);
-ui.setTopbarSync(() => compactTopbarMenus.sync());
-ui.refreshTopbarActionButtons();
-languageSwitcher.render();
-syncMapViewEditorButtons();
-ui.setModeWord(getUiText(state, "mode_map"), true);
-ui.togglePanel(true);
-mapModule.applyMapTransform();
+    ui.setPalette(state.currentPalette);
+    ui.togglePalettePopover(false);
+    ui.setPanelEditable(false);
+    ui.setTopbarSync(() => compactTopbarMenus.sync());
+    ui.refreshTopbarActionButtons();
+    languageSwitcher.render();
+    syncMapViewEditorButtons();
+    syncSectionVisibilityControls();
+    ui.setModeWord(getUiText(state, "mode_map"), true);
+    ui.togglePanel(true);
+    mapModule.applyMapTransform();
 
-setupTopLevelInteractions();
-mapModule.setupMapNavigation();
-editor.setupEditorInteractions();
-activeMapController.setup();
-homebrewController.setup();
+    setupTopLevelInteractions();
+    setupSectionVisibilityControls();
+    mapModule.setupMapNavigation();
+    editor.setupEditorInteractions();
+    homebrewController.setup();
 
-els.importDataInput.addEventListener("change", async (event) => {
-  const [file] = Array.from(event.target.files || []);
-  try {
-    await importChangesFromFile(file);
-  } catch (error) {
-    console.error(error);
+    els.importDataInput.addEventListener("change", async (event) => {
+      const [file] = Array.from(event.target.files || []);
+      try {
+        await importChangesFromFile(file);
+      } catch (error) {
+        console.error(error);
     window.alert("Не удалось импортировать JSON. Проверь файл changes.json и его структуру.");
-  } finally {
-    els.importDataInput.value = "";
-  }
-});
+      } finally {
+        els.importDataInput.value = "";
+      }
+    });
 
-await init();
+    await init();
   } catch (error) {
     await handleFatalStartupError(error);
   }

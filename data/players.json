@@ -1,10 +1,17 @@
-{
+﻿{
   "players": [
     {
       "id": "dima",
       "name": "Дима",
       "label": "Игрок",
       "notes": "Ведёт Золотого странника и чаще всего тащит дипломатию.",
+      "translations": {
+        "en": {
+          "name": "Dima",
+          "label": "Player",
+          "notes": "Pilots the Golden Wanderer and usually carries the diplomacy scenes."
+        }
+      },
       "characters": [
         {
           "groupId": "first-party",
@@ -17,6 +24,13 @@
       "name": "Алиса",
       "label": "Игрок",
       "notes": "Следопыт и разведка партии.",
+      "translations": {
+        "en": {
+          "name": "Alisa",
+          "label": "Player",
+          "notes": "The party's pathfinder and scout."
+        }
+      },
       "characters": [
         {
           "groupId": "first-party",

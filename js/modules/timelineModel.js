@@ -1,10 +1,11 @@
 import { getLocalizedText } from "./localization.js";
+import { getUiText } from "./uiLocale.js";
 
 // Sidebar shortcuts provide stable "jump points" on long timelines.
 export const DEFAULT_TIMELINE_SHORTCUTS = [
-  { label: "Старт", title: "Начало кампании", eventId: "founding" },
-  { label: "NOW", title: "Текущая эпоха", eventId: "campaign-start" },
-  { label: "Союз", title: "Союз гильдий", eventId: "guild-union" },
+  { label: "Старт", title: "Начало кампании", eventId: "founding", translations: { en: { label: "Start", title: "Campaign start" } } },
+  { label: "NOW", title: "Текущая эпоха", eventId: "campaign-start", translations: { en: { label: "NOW", title: "Current era" } } },
+  { label: "Союз", title: "Союз гильдий", eventId: "guild-union", translations: { en: { label: "Union", title: "Guild union" } } },
 ];
 
 export function parseTimelineOrderValue(yearText) {
@@ -37,7 +38,7 @@ export function getDefaultTimelineShortcutLabel(event) {
   return titleLabel.split(/\s+/).slice(0, 2).join(" ").slice(0, 8);
 }
 
-export function getTimelineSidebarActions(eventsData, defaultShortcuts = DEFAULT_TIMELINE_SHORTCUTS) {
+export function getTimelineSidebarActions(eventsData, defaultShortcuts = DEFAULT_TIMELINE_SHORTCUTS, context = null) {
   // Default shortcuts are filled first, then user-defined shortcuts are added
   // without duplicating events that already have a reserved slot.
   const actions = [];
@@ -45,7 +46,12 @@ export function getTimelineSidebarActions(eventsData, defaultShortcuts = DEFAULT
 
   defaultShortcuts.forEach((action) => {
     if (!eventsData.some((event) => event.id === action.eventId)) return;
-    actions.push({ ...action, isDefault: true });
+    actions.push({
+      ...action,
+      label: getLocalizedText(action, "label", context, action.label),
+      title: getLocalizedText(action, "title", context, action.title),
+      isDefault: true,
+    });
     usedEventIds.add(action.eventId);
   });
 
@@ -53,7 +59,7 @@ export function getTimelineSidebarActions(eventsData, defaultShortcuts = DEFAULT
     if (!event?.sidebarShortcut || usedEventIds.has(event.id)) return;
     actions.push({
       label: event.sidebarShortcutLabel?.trim?.() || getDefaultTimelineShortcutLabel(event),
-      title: event.title || event.year || "Событие",
+      title: getLocalizedText(event, "title", context, event.year || getUiText(context, "timeline_event")),
       eventId: event.id,
       isDefault: false,
     });

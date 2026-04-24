@@ -3,7 +3,18 @@ const NOTES_STORAGE_KEY = "serkonia:player-notes";
 const MAX_FAVORITES = 24;
 const MAX_NOTE_PAGES = 10;
 const MAX_NOTE_PAGE_LABEL = 5;
-const DEFAULT_NOTE_PAGE_LABEL = "Общ.";
+const DEFAULT_NOTE_PAGE_LABEL = "notes_default_page";
+
+const LEGACY_DEFAULT_NOTE_PAGE_LABELS = new Set([
+  "",
+  "Common",
+  "notes_default_page",
+  "Общ",
+  "Общ.",
+  "Общее",
+  "???",
+  "???.",
+]);
 
 // Storage helpers intentionally fail softly: favorites and notes are personal
 // conveniences, so broken localStorage should never break the whole app.
@@ -29,7 +40,13 @@ function safeWriteStorage(key, value) {
   }
 }
 
+function isDefaultNotePageLabel(value) {
+  return LEGACY_DEFAULT_NOTE_PAGE_LABELS.has(String(value || "").trim());
+}
+
 function normalizeNotePageLabel(value) {
+  if (isDefaultNotePageLabel(value)) return DEFAULT_NOTE_PAGE_LABEL;
+
   const normalized = String(value || "").trim().slice(0, MAX_NOTE_PAGE_LABEL);
   return normalized || DEFAULT_NOTE_PAGE_LABEL;
 }
@@ -98,6 +115,7 @@ export {
   createLocalId,
   safeReadStorage,
   safeWriteStorage,
+  isDefaultNotePageLabel,
   normalizeNotePageLabel,
   createNotePage,
   createDefaultNotesState,

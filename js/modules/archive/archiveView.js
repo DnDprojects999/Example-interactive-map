@@ -8,6 +8,7 @@ import {
   isFactionArchiveGroup,
 } from "../factionSymbols.js";
 import { getLocalizedText } from "../localization.js";
+import { getUiText } from "../uiLocale.js";
 
 // Archive view factories build the visual card hierarchy for both compact cards
 // and expanded cards. The controller decides when they open; this file decides
@@ -26,7 +27,12 @@ export function createArchiveGroupSection(group, options = {}) {
 
   const heading = document.createElement("h2");
   heading.className = "archive-group-title";
-  heading.textContent = getLocalizedText(group, "title", localizationContext, "Группа");
+  heading.textContent = getLocalizedText(
+    group,
+    "title",
+    localizationContext,
+    getUiText(localizationContext, "archive_group_fallback"),
+  );
   heading.contentEditable = String(editMode);
 
   const cardsGrid = document.createElement("div");
@@ -60,8 +66,7 @@ export function createArchiveExpandedCard(item, options = {}) {
     onCollapse = () => {},
     group = null,
   } = options;
-  // Faction groups render an extra heraldry/symbol panel that ordinary archive
-  // groups do not need.
+
   const factionGroup = isFactionArchiveGroup(group);
 
   const expanded = document.createElement("article");
@@ -73,15 +78,13 @@ export function createArchiveExpandedCard(item, options = {}) {
   const collapseButton = document.createElement("button");
   collapseButton.className = "archive-collapse";
   collapseButton.type = "button";
-  collapseButton.title = "Скрыть раскрытую карточку";
+  collapseButton.title = getUiText(localizationContext, "archive_collapse_title");
   collapseButton.textContent = "×";
   collapseButton.addEventListener("click", onCollapse);
 
   const visual = document.createElement("div");
   visual.className = "archive-expanded-visual";
-  if (editMode) {
-    visual.title = "Клик/перетаскивание — отдельная картинка раскрытия. Если пусто, используется миниатюра.";
-  }
+  if (editMode) visual.title = getUiText(localizationContext, "archive_expanded_image_title");
   renderArchiveExpandedImage(visual, item, mapViewMode, localizationContext);
 
   const body = document.createElement("div");
@@ -93,7 +96,12 @@ export function createArchiveExpandedCard(item, options = {}) {
 
   const title = document.createElement("h3");
   title.className = "archive-expanded-title";
-  title.textContent = getLocalizedText(item, "title", localizationContext, "Без названия");
+  title.textContent = getLocalizedText(
+    item,
+    "title",
+    localizationContext,
+    getUiText(localizationContext, "archive_item_title_fallback"),
+  );
   title.contentEditable = String(editMode);
   head.appendChild(title);
 
@@ -103,7 +111,12 @@ export function createArchiveExpandedCard(item, options = {}) {
     item,
     "fullDescription",
     localizationContext,
-    getLocalizedText(item, "description", localizationContext, "Подробное описание пока не добавлено."),
+    getLocalizedText(
+      item,
+      "description",
+      localizationContext,
+      getUiText(localizationContext, "archive_item_full_description_fallback"),
+    ),
   );
   text.contentEditable = String(editMode);
 
@@ -121,7 +134,7 @@ export function createArchiveSymbolBadge(symbolUrl, label, className) {
   const image = document.createElement("img");
   image.className = `${className}-image`;
   image.src = symbolUrl;
-  image.alt = label || "Символ фракции";
+  image.alt = label || "Faction symbol";
   image.loading = "lazy";
   image.decoding = "async";
   badge.appendChild(image);
@@ -136,7 +149,12 @@ export function renderArchiveExpandedSymbolSlot(slot, item, localizationContext 
   if (!explicitSymbolUrl) {
     const placeholder = document.createElement("span");
     placeholder.className = "archive-expanded-symbol-placeholder";
-    placeholder.textContent = getLocalizedText(item, "symbolLabel", localizationContext, "Добавь герб, логотип или символ");
+    placeholder.textContent = getLocalizedText(
+      item,
+      "symbolLabel",
+      localizationContext,
+      getUiText(localizationContext, "archive_symbol_placeholder"),
+    );
     slot.appendChild(placeholder);
     return;
   }
@@ -144,7 +162,12 @@ export function renderArchiveExpandedSymbolSlot(slot, item, localizationContext 
   const image = document.createElement("img");
   image.className = "archive-expanded-symbol-slot-image";
   image.src = explicitSymbolUrl;
-  image.alt = getLocalizedText(item, "symbolLabel", localizationContext, getLocalizedText(item, "title", localizationContext, "Символ фракции"));
+  image.alt = getLocalizedText(
+    item,
+    "symbolLabel",
+    localizationContext,
+    getLocalizedText(item, "title", localizationContext, getUiText(localizationContext, "archive_symbol_alt")),
+  );
   image.loading = "lazy";
   image.decoding = "async";
   slot.appendChild(image);
@@ -184,7 +207,7 @@ function createArchiveCard(item, options) {
     const expandEditButton = document.createElement("button");
     expandEditButton.className = "archive-card-expand-edit";
     expandEditButton.type = "button";
-    expandEditButton.textContent = "раскрыть";
+    expandEditButton.textContent = getUiText(localizationContext, "archive_expand");
     expandEditButton.addEventListener("click", (event) => {
       event.stopPropagation();
       onExpand();
@@ -199,18 +222,26 @@ function createArchiveCard(item, options) {
   if (symbolUrl) {
     image.appendChild(createArchiveSymbolBadge(symbolUrl, getArchiveItemSymbolLabel(item), "archive-card-symbol"));
   }
-  if (editMode) {
-    image.title = "Вставь/перетащи изображение. Двойной клик — изменить подпись.";
-  }
+  if (editMode) image.title = getUiText(localizationContext, "archive_card_image_title");
 
   const title = document.createElement("h3");
   title.className = "archive-card-title";
-  title.textContent = getLocalizedText(item, "title", localizationContext, "Без названия");
+  title.textContent = getLocalizedText(
+    item,
+    "title",
+    localizationContext,
+    getUiText(localizationContext, "archive_item_title_fallback"),
+  );
   title.contentEditable = String(editMode);
 
   const text = document.createElement("p");
   text.className = "archive-card-text";
-  text.textContent = getLocalizedText(item, "description", localizationContext, "Описание пока не заполнено.");
+  text.textContent = getLocalizedText(
+    item,
+    "description",
+    localizationContext,
+    getUiText(localizationContext, "archive_item_description_fallback"),
+  );
   text.contentEditable = String(editMode);
 
   card.append(image, title, text);
@@ -223,13 +254,11 @@ function createArchiveExpandedSymbolPanel(item, editMode, localizationContext) {
 
   const label = document.createElement("span");
   label.className = "archive-expanded-symbol-caption";
-  label.textContent = "Герб / символ";
+  label.textContent = getUiText(localizationContext, "archive_symbol_label");
 
   const slot = document.createElement("div");
   slot.className = "archive-expanded-symbol-slot";
-  if (editMode) {
-    slot.title = "Клик, Ctrl+V или перетаскивание — отдельный герб/лого для карты и бейджа карточки.";
-  }
+  if (editMode) slot.title = getUiText(localizationContext, "archive_symbol_title");
   renderArchiveExpandedSymbolSlot(slot, item, localizationContext);
 
   panel.append(label, slot);

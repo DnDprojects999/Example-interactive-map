@@ -6,6 +6,7 @@ import {
   getTimelineActTitle,
 } from "./timelineModel.js";
 import { getLocalizedText } from "./localization.js";
+import { getUiText } from "./uiLocale.js";
 
 // DOM factory helpers for timeline rendering. They keep the render code in ui.js
 // focused on flow control instead of hand-building every element inline.
@@ -58,7 +59,7 @@ export function createTimelineEventItem(event, options = {}) {
 
   const title = document.createElement("h3");
   title.className = "event-title";
-  title.textContent = getLocalizedText(event, "title", localizationContext, "Без названия");
+  title.textContent = getLocalizedText(event, "title", localizationContext, getUiText(localizationContext, "timeline_event_untitled"));
   title.contentEditable = String(editMode);
 
   const act = findTimelineAct(actsData, event.actId);
@@ -116,6 +117,7 @@ function createTimelineEventActions(event, callbacks) {
     onActivateMarkerLink,
     onAssignAct,
   } = callbacks;
+
   // Action buttons depend on both edit state and the event data itself.
   const showMapButton = editMode || Boolean(event.markerId);
   const showActButton = editMode && Array.isArray(actsData) && actsData.length > 0;
@@ -130,8 +132,10 @@ function createTimelineEventActions(event, callbacks) {
       className: `event-map-link-button ${event.markerId ? "active" : ""}`.trim(),
       text: "\u25A1",
       title: editMode
-        ? (event.markerId ? "Сменить или убрать метку карты" : "Привязать место на карте")
-        : "Открыть место события на карте",
+        ? (event.markerId
+          ? getUiText(localizationContext, "timeline_action_map_change")
+          : getUiText(localizationContext, "timeline_action_map_attach"))
+        : getUiText(localizationContext, "timeline_action_map_open"),
       onClick: () => onActivateMarkerLink(event.id),
     });
     actions.appendChild(mapButton);
@@ -143,8 +147,8 @@ function createTimelineEventActions(event, callbacks) {
       className: "event-act-button",
       text: currentAct ? getTimelineActShortLabel(currentAct, localizationContext, "Act") : "ALL",
       title: currentAct
-        ? `Акт: ${getTimelineActTitle(currentAct, localizationContext, "Act")}`
-        : "Общая хроника",
+        ? `Act: ${getTimelineActTitle(currentAct, localizationContext, "Act")}`
+        : getUiText(localizationContext, "timeline_general_title"),
       onClick: () => onAssignAct(event.id),
     });
     actions.appendChild(actButton);
@@ -156,8 +160,10 @@ function createTimelineEventActions(event, callbacks) {
       className: `event-shortcut-toggle ${event.sidebarShortcut ? "active" : ""}`,
       text: isDefaultShortcut ? "=" : (event.sidebarShortcut ? "*" : "+"),
       title: isDefaultShortcut
-        ? "Эта быстрая точка уже входит в базовый набор"
-        : (event.sidebarShortcut ? "Убрать из быстрых точек" : "Добавить в быстрые точки"),
+        ? getUiText(localizationContext, "timeline_action_shortcut_fixed")
+        : (event.sidebarShortcut
+          ? getUiText(localizationContext, "timeline_action_shortcut_remove")
+          : getUiText(localizationContext, "timeline_action_shortcut_add")),
       disabled: isDefaultShortcut,
       onClick: () => onToggleShortcut(event.id),
     });
@@ -166,15 +172,15 @@ function createTimelineEventActions(event, callbacks) {
       className: "event-position-toggle",
       text: event.position === "down" ? "\u2191" : "\u2193",
       title: event.position === "down"
-        ? "Поднять событие над линией"
-        : "Опустить событие под линию",
+        ? getUiText(localizationContext, "timeline_action_position_up")
+        : getUiText(localizationContext, "timeline_action_position_down"),
       onClick: () => onTogglePosition(event.id),
     });
 
     const deleteButton = createEventActionButton({
       className: "event-delete-button",
       text: "\u2715",
-      title: "Удалить событие",
+      title: getUiText(localizationContext, "timeline_action_delete"),
       onClick: () => onDelete(event.id),
     });
 

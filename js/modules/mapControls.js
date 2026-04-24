@@ -1,4 +1,4 @@
-import { DRAW_BRUSH_PALETTE } from "./uiConfig.js";
+﻿import { DRAW_BRUSH_PALETTE } from "./uiConfig.js";
 import {
   canUserSeeMapViewSwitcher,
   getMapViewLabel,
@@ -16,8 +16,8 @@ export function createMapControlsController(options) {
 
   const getCallbacks = () => getMapEditorCallbacks?.() || {};
 
-  // Body classes mirror the active map display mode so CSS can switch art,
-  // textures, and mode-specific styling without manual DOM rewrites.
+  // Body classes mirror the map display mode so CSS can switch art, textures,
+  // and mode-specific styling without manual DOM rewrites.
   function getBodyClassForMode(modeId) {
     return `map-view-${String(modeId || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "-")}`;
   }
@@ -82,7 +82,7 @@ export function createMapControlsController(options) {
     DRAW_BRUSH_PALETTE.forEach((entry) => {
       const option = document.createElement("option");
       option.value = entry.value;
-      option.textContent = entry.label;
+      option.textContent = state.currentLanguage === "en" ? entry.labelEn : entry.labelRu;
       els.drawBrushColorSelect.appendChild(option);
     });
     els.drawBrushColorSelect.value = state.drawBrushColor || DRAW_BRUSH_PALETTE[0].value;

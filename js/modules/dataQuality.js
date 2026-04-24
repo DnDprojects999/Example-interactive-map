@@ -1,366 +1,60 @@
-import { isFactionArchiveGroup, getArchiveItemSymbolUrl } from "./factionSymbols.js";
+import { runAudit } from "./quality/runAudit.js";
+import { formatIssue } from "./quality/formatIssue.js";
+import { fixMojibake } from "./quality/utils.js";
+import { createErrorBus } from "./diagnostics/errorBus.js";
+import { createNotificationStore } from "./diagnostics/notificationStore.js";
+import { createLogLevelLabel } from "./diagnostics/logFormatter.js";
 
-// The data-quality report is intentionally heuristic. It is meant to catch
-// suspicious placeholders, missing media, and broken references before export,
-// not to act as a strict schema validator.
-const PLACEHOLDER_PATTERNS = [
-  "новый поворот хроники",
-  "новая глава",
-  "новая запись",
-  "новая фракция",
-  "новый город",
-  "новый орган власти",
-  "новая партия",
-  "новый герой",
-  "добавь портрет героя",
-  "описание пока",
-  "короткое описание",
-  "подробное описание",
-  "роль в хронике",
-  "факт 1",
-  "факт 2",
-  "факт 3",
-  "что именно произошло",
-];
+const INFO_VIEWS = new Set(["audit", "logs", "notifications", "hints"]);
 
-const TITLE_LIMIT = 90;
-const LABEL_LIMIT = 24;
-const IMAGE_LABEL_LIMIT = 56;
-const DATA_URL_WARN_LENGTH = 300000;
+function renderAuditFilters(els, scopes, activeScope, selectScope, getUiText = null) {
+  const t = (key, params = {}) => (typeof getUiText === "function" ? getUiText(key, params) : key);
+  els.dataQualityFilters.innerHTML = "";
+  els.dataQualityFilters.hidden = false;
 
-function normalize(value) {
-  return String(value || "").trim().toLowerCase();
-}
+  const makeButton = (label, value) => {
+    const button = document.createElement("button");
+    button.className = "data-quality-filter";
+    button.type = "button";
+    button.textContent = label;
+    button.classList.toggle("is-active", value === activeScope);
+    button.addEventListener("click", () => selectScope(value));
+    els.dataQualityFilters.appendChild(button);
+  };
 
-function isBlankOrPlaceholder(value) {
-  const text = normalize(value);
-  if (!text) return true;
-  return PLACEHOLDER_PATTERNS.some((pattern) => text.includes(pattern));
-}
-
-function isTooLong(value, limit) {
-  return String(value || "").trim().length > limit;
-}
-
-function addIssue(issues, scope, title, message, target = null) {
-  issues.push({ scope, title, message, target });
-}
-
-function addIssueIf(condition, issues, scope, title, message, target = null) {
-  if (!condition) return;
-  addIssue(issues, scope, title, message, target);
-}
-
-function reportBlankField(issues, scope, title, value, fallback, target) {
-  addIssueIf(isBlankOrPlaceholder(value), issues, scope, title, fallback, target);
-}
-
-function reportLengthField(issues, scope, title, value, fallback, target, limit) {
-  addIssueIf(isTooLong(value, limit), issues, scope, title, fallback, target);
-}
-
-function checkPossibleUrl(value) {
-  const raw = String(value || "").trim();
-  if (!raw) return null;
-
-  if (raw === "http:" || raw === "https:" || raw === "http://" || raw === "https://") {
-    return "Ссылка выглядит незаконченной.";
-  }
-
-  if (/\s/.test(raw)) {
-    return "В ссылке есть пробелы.";
-  }
-
-  if (raw.startsWith("data:")) {
-    return /^data:image\/[a-z0-9.+-]+;base64,/i.test(raw) ? null : "Data URL выглядит подозрительно.";
-  }
-
-  if (/^(https?:)?\/\//i.test(raw)) {
-    try {
-      const url = new URL(raw.startsWith("//") ? `https:${raw}` : raw);
-      return ["http:", "https:"].includes(url.protocol) ? null : "Неподдерживаемый протокол ссылки.";
-    } catch {
-      return "Ссылка не похожа на валидный URL.";
-    }
-  }
-
-  if (/^(assets\/|\.\/|\.\.\/|\/)/.test(raw)) return null;
-  if (/^[\w./-]+\.(png|jpg|jpeg|webp|gif|svg|avif)$/i.test(raw)) return null;
-  return "Ссылка не похожа на URL или путь к файлу.";
-}
-
-function registerEntityId(registry, namespace, scopeLabel, id, target) {
-  const key = String(id || "").trim();
-  if (!key) return;
-
-  const registryKey = `${namespace}:${key}`;
-  if (!registry.has(registryKey)) registry.set(registryKey, []);
-  registry.get(registryKey).push({
-    scopeLabel,
-    idLabel: key,
-    target,
+  makeButton(t("audit_filter_all"), "all");
+  scopes.forEach((scope) => {
+    const fixedScope = fixMojibake(scope.value);
+    makeButton(scope.label || fixedScope, fixedScope);
   });
 }
 
-// Duplicate ids are reported by logical namespace, not globally, so archive
-// items and heroes can each own an "id" without colliding across subsystems.
-function reportDuplicateIds(issues, registry) {
-  registry.forEach((entries) => {
-    if (entries.length < 2) return;
-    const [first] = entries;
-
-    addIssue(
-      issues,
-      "ID",
-      "Дубликат id",
-      `Идентификатор "${first.idLabel}" повторяется в ${entries.length} местах внутри ${first.scopeLabel}. Лучше сделать его уникальным.`,
-      first.target,
-    );
-  });
-}
-
-function reportImageUrlIssues(issues, scope, ownerTitle, imageUrl, target) {
-  const linkProblem = checkPossibleUrl(imageUrl);
-  if (linkProblem) {
-    addIssue(issues, scope, "Подозрительная ссылка на изображение", `${ownerTitle}: ${linkProblem}`, target);
-  }
-
-  if (String(imageUrl || "").startsWith("data:") && String(imageUrl).length > DATA_URL_WARN_LENGTH) {
-    addIssue(
-      issues,
-      scope,
-      "Слишком тяжёлый data URL",
-      `${ownerTitle}: это изображение лучше вынести в assets, чтобы сайт не пух.`,
-      target,
-    );
-  }
-}
-
-function auditMapMarker(issues, registry, marker) {
-  const target = { type: "marker", id: marker.id };
-  registerEntityId(registry, "marker", "карты", marker.id, target);
-
-  reportBlankField(issues, "Карта", "Метка без нормального названия", marker.title, marker.title || marker.id, target);
-  reportBlankField(issues, "Карта", "У метки нет описания", marker.description, marker.title || marker.id, target);
-  reportLengthField(issues, "Карта", "Слишком длинный заголовок", marker.title, marker.title, target, TITLE_LIMIT);
-  addIssueIf(Boolean(marker.imageText && !marker.imageUrl), issues, "Карта", "Есть подпись, но нет картинки", marker.title || marker.id, target);
-
-  const facts = Array.isArray(marker.facts) ? marker.facts : [];
-  addIssueIf(
-    facts.length < 3 || facts.some(isBlankOrPlaceholder),
-    issues,
-    "Карта",
-    "У метки не заполнены факты",
-    marker.title || marker.id,
-    target,
-  );
-
-  reportImageUrlIssues(issues, "Карта", marker.title || marker.id, marker.imageUrl, target);
-  reportLengthField(
-    issues,
-    "Карта",
-    "Слишком длинная подпись изображения",
-    marker.imageText,
-    marker.title || marker.id,
-    target,
-    IMAGE_LABEL_LIMIT,
-  );
-}
-
-function auditActiveMarker(issues, registry, marker) {
-  const target = { type: "activeMarker", id: marker.id };
-  registerEntityId(registry, "activeMarker", "Active Map", marker.id, target);
-
-  reportBlankField(issues, "Active Map", "Событие без названия", marker.title, marker.title || marker.id, target);
-  reportBlankField(issues, "Active Map", "У активного события нет описания", marker.description, marker.title || marker.id, target);
-  reportLengthField(issues, "Active Map", "Слишком длинный заголовок", marker.title, marker.title, target, TITLE_LIMIT);
-  reportImageUrlIssues(issues, "Active Map", marker.title || marker.id, marker.imageUrl, target);
-}
-
-function auditTimelineEvent(issues, registry, event) {
-  const target = { type: "timeline", id: event.id };
-  registerEntityId(registry, "timelineEvent", "Timeline", event.id, target);
-
-  reportBlankField(issues, "Timeline", "Событие без названия", event.title, event.year || event.id, target);
-  reportBlankField(issues, "Timeline", "Событие без описания", event.description, event.title || event.id, target);
-  reportLengthField(issues, "Timeline", "Слишком длинный заголовок", event.title, event.title, target, TITLE_LIMIT);
-  addIssueIf(
-    Boolean(event.sidebarShortcut && isTooLong(event.sidebarShortcutLabel, LABEL_LIMIT)),
-    issues,
-    "Timeline",
-    "Слишком длинная подпись боковой кнопки",
-    event.title || event.id,
-    target,
-  );
-}
-
-function auditArchiveGroup(issues, registry, group) {
-  const target = { type: "archiveGroup", id: group.id };
-  registerEntityId(registry, "archiveGroup", "глав архива", group.id, target);
-
-  reportBlankField(issues, "Archive", "Глава архива без названия", group.title, group.id, target);
-  reportLengthField(issues, "Archive", "Слишком длинный заголовок главы", group.title, group.title, target, TITLE_LIMIT);
-}
-
-function auditArchiveItem(issues, registry, group, item) {
-  const target = { type: "archiveItem", id: item.id, groupId: group.id };
-  registerEntityId(
-    registry,
-    `archiveItem:${group.id}`,
-    `карточек архива в главе "${group.title || group.id}"`,
-    item.id,
-    target,
-  );
-
-  reportBlankField(issues, "Archive", "Карточка без названия", item.title, group.title || group.id, target);
-  reportBlankField(issues, "Archive", "Карточка без короткого описания", item.description, item.title || item.id, target);
-  reportBlankField(issues, "Archive", "Карточка без полного описания", item.fullDescription, item.title || item.id, target);
-  addIssueIf(!String(item.imageUrl || "").trim(), issues, "Archive", "У карточки нет превью-изображения", item.title || item.id, target);
-  addIssueIf(
-    Boolean(isFactionArchiveGroup(group) && !getArchiveItemSymbolUrl(item)),
-    issues,
-    "Archive",
-    "У фракции нет символа или герба",
-    item.title || item.id,
-    target,
-  );
-  reportLengthField(issues, "Archive", "Слишком длинный заголовок карточки", item.title, item.title, target, TITLE_LIMIT);
-  addIssueIf(
-    isTooLong(item.imageLabel, IMAGE_LABEL_LIMIT) || isTooLong(item.expandedImageLabel, IMAGE_LABEL_LIMIT),
-    issues,
-    "Archive",
-    "Слишком длинная подпись изображения",
-    item.title || item.id,
-    target,
-  );
-  reportImageUrlIssues(issues, "Archive", item.title || item.id, item.imageUrl, target);
-  reportImageUrlIssues(issues, "Archive", item.title || item.id, item.expandedImageUrl, target);
-}
-
-function auditHeroGroup(issues, registry, group) {
-  const target = { type: "heroGroup", id: group.id };
-  registerEntityId(registry, "heroGroup", "групп героев", group.id, target);
-
-  reportBlankField(issues, "Hall", "Группа героев без названия", group.title, group.id, target);
-  reportBlankField(issues, "Hall", "У группы нет подзаголовка", group.subtitle, group.title || group.id, target);
-  reportLengthField(issues, "Hall", "Слишком длинный заголовок группы", group.title, group.title, target, TITLE_LIMIT);
-}
-
-function auditHeroItem(issues, registry, group, hero) {
-  const target = { type: "heroItem", id: hero.id, groupId: group.id };
-  registerEntityId(
-    registry,
-    `heroItem:${group.id}`,
-    `героев в группе "${group.title || group.id}"`,
-    hero.id,
-    target,
-  );
-
-  reportBlankField(issues, "Hall", "Герой без имени", hero.title, group.title || group.id, target);
-  reportBlankField(issues, "Hall", "У героя не заполнена роль", hero.role, hero.title || hero.id, target);
-  reportBlankField(issues, "Hall", "У героя нет короткого описания", hero.description, hero.title || hero.id, target);
-  reportBlankField(issues, "Hall", "У героя нет полного описания", hero.fullDescription, hero.title || hero.id, target);
-  addIssueIf(!String(hero.imageUrl || "").trim(), issues, "Hall", "У героя нет портрета", hero.title || hero.id, target);
-  reportLengthField(issues, "Hall", "Слишком длинный заголовок героя", hero.title, hero.title, target, TITLE_LIMIT);
-  reportLengthField(issues, "Hall", "Слишком длинная подпись портрета", hero.imageLabel, hero.title || hero.id, target, IMAGE_LABEL_LIMIT);
-  reportImageUrlIssues(issues, "Hall", hero.title || hero.id, hero.imageUrl, target);
-}
-
-function auditActiveMapMeta(issues, registry, state) {
-  const baseMarkerIds = new Set(
-    state.markersData
-      .map((marker) => String(marker?.id || "").trim())
-      .filter(Boolean),
-  );
-
-  (state.activeMapData?.pinnedMarkerIds || []).forEach((markerId) => {
-    if (baseMarkerIds.has(String(markerId || "").trim())) return;
-    addIssue(
-      issues,
-      "Active Map",
-      "Закреплена несуществующая базовая метка",
-      `Pinned marker id "${markerId}" не найден в основной карте.`,
-    );
-  });
-
-  (state.activeMapData?.routes || []).forEach((route) => {
-    registerEntityId(registry, "activeRoute", "маршрутов Active Map", route?.id, null);
-
-    if (!Array.isArray(route?.points) || route.points.length < 2) {
-      addIssue(
-        issues,
-        "Active Map",
-        "Маршрут недорисован",
-        route?.title || route?.id || "У маршрута меньше двух точек.",
-      );
-      return;
-    }
-
-    const hasInvalidPoint = route.points.some((point) => {
-      const x = Number(point?.x);
-      const y = Number(point?.y);
-      return !Number.isFinite(x) || !Number.isFinite(y) || x < 0 || x > 100 || y < 0 || y > 100;
-    });
-
-    addIssueIf(
-      hasInvalidPoint,
-      issues,
-      "Active Map",
-      "Маршрут выходит за пределы карты",
-      route?.title || route?.id || "У маршрута есть точки вне диапазона 0-100%.",
-    );
-  });
-}
-
-function collectIssues(state) {
-  // Aggregate every subsystem into one report so creators can do a last-pass
-  // content audit before sharing the project.
-  const issues = [];
-  const idsRegistry = new Map();
-
-  state.markersData.forEach((marker) => auditMapMarker(issues, idsRegistry, marker));
-  (state.activeMapData?.markers || []).forEach((marker) => auditActiveMarker(issues, idsRegistry, marker));
-  state.eventsData.forEach((event) => auditTimelineEvent(issues, idsRegistry, event));
-
-  state.archiveData.forEach((group) => {
-    auditArchiveGroup(issues, idsRegistry, group);
-    (group.items || []).forEach((item) => auditArchiveItem(issues, idsRegistry, group, item));
-  });
-
-  state.heroesData.forEach((group) => {
-    auditHeroGroup(issues, idsRegistry, group);
-    (group.items || []).forEach((hero) => auditHeroItem(issues, idsRegistry, group, hero));
-  });
-
-  auditActiveMapMeta(issues, idsRegistry, state);
-  reportDuplicateIds(issues, idsRegistry);
-  return issues;
-}
-
-function renderIssuesList(els, issues, onNavigate, close) {
+function renderIssuesList(els, issues, onNavigate, close, getUiText = null, state = null) {
   els.dataQualityList.innerHTML = "";
+  const t = (key, params = {}) => (typeof getUiText === "function" ? getUiText(key, params) : key);
 
   if (!issues.length) {
-    const ok = document.createElement("div");
-    ok.className = "data-quality-ok";
-    ok.textContent = "Красота. Можно спокойно показывать игрокам.";
-    els.dataQualityList.appendChild(ok);
+    const empty = document.createElement("div");
+    empty.className = "data-quality-empty";
+    empty.textContent = t("audit_empty_text");
+    els.dataQualityList.appendChild(empty);
     return;
   }
 
   issues.forEach((issue) => {
+    const formatted = formatIssue(issue, state, getUiText);
     const button = document.createElement("button");
     button.className = "data-quality-item";
     button.type = "button";
 
     const scope = document.createElement("span");
-    scope.textContent = issue.scope;
+    scope.textContent = formatted.scopeLabel;
 
     const title = document.createElement("strong");
-    title.textContent = issue.title;
+    title.textContent = formatted.title;
 
     const message = document.createElement("em");
-    message.textContent = issue.message;
+    message.textContent = formatted.targetLabel;
 
     button.append(scope, title, message);
     button.addEventListener("click", () => {
@@ -371,37 +65,322 @@ function renderIssuesList(els, issues, onNavigate, close) {
   });
 }
 
+function renderRuntimeList(els, entries, emptyText) {
+  els.dataQualityList.innerHTML = "";
+
+  if (!entries.length) {
+    const empty = document.createElement("div");
+    empty.className = "data-quality-empty";
+    empty.textContent = emptyText;
+    els.dataQualityList.appendChild(empty);
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const article = document.createElement("article");
+    article.className = `data-quality-log data-quality-log-${entry.level}`;
+
+    const meta = document.createElement("div");
+    meta.className = "data-quality-log-meta";
+
+    const level = document.createElement("span");
+    level.className = "data-quality-log-level";
+    level.textContent = createLogLevelLabel(entry.level);
+
+    const source = document.createElement("span");
+    source.className = "data-quality-log-source";
+    source.textContent = entry.source || "runtime";
+
+    const time = document.createElement("span");
+    time.className = "data-quality-log-time";
+    time.textContent = entry.timeLabel;
+
+    meta.append(level, source, time);
+
+    const title = document.createElement("strong");
+    title.className = "data-quality-log-title";
+    title.textContent = entry.title;
+
+    const message = document.createElement("p");
+    message.className = "data-quality-log-message";
+    message.textContent = entry.message;
+
+    article.append(meta, title, message);
+
+    if (entry.details) {
+      const details = document.createElement("pre");
+      details.className = "data-quality-log-details";
+      details.textContent = entry.details;
+      article.appendChild(details);
+    }
+
+    els.dataQualityList.appendChild(article);
+  });
+}
+
+function resetFilters(els) {
+  els.dataQualityFilters.hidden = true;
+  els.dataQualityFilters.innerHTML = "";
+}
+
+function applyPanelHeading(els, kicker, title, summary) {
+  els.dataQualityKicker.textContent = kicker;
+  els.dataQualityTitle.textContent = title;
+  els.dataQualitySummary.textContent = summary;
+}
+
+function renderHintsView(els, getUiText = null, hintsEnabled = false, state = null) {
+  const t = (key, params = {}) => (typeof getUiText === "function" ? getUiText(key, params) : key);
+  els.dataQualityList.innerHTML = "";
+
+  const card = document.createElement("section");
+  card.className = "data-quality-hints-card";
+
+  const title = document.createElement("strong");
+  title.className = "data-quality-hints-title";
+  title.textContent = t("info_hints_title");
+
+  const text = document.createElement("p");
+  text.className = "data-quality-hints-text";
+  text.textContent = t("info_hints_empty");
+
+  const button = document.createElement("button");
+  button.className = "data-quality-hints-action";
+  button.type = "button";
+  button.textContent = t(hintsEnabled ? "info_hints_toggle_disable" : "info_hints_toggle_enable");
+  button.dataset.hintsToggle = "true";
+
+  const resetButton = document.createElement("button");
+  resetButton.className = "data-quality-hints-action";
+  resetButton.type = "button";
+  resetButton.textContent = t("info_hints_reset");
+  resetButton.dataset.hintsReset = "true";
+
+  card.append(title, text, button, resetButton);
+  els.dataQualityList.appendChild(card);
+}
+
 export function createDataQualityController(options) {
   const {
     els,
     state,
+    getUiText,
     onNavigate,
+    onHintsEnabledChange,
+    onResetHints,
+    initialHintsEnabled = true,
   } = options;
 
-  function close() {
-    els.dataQualityPanel.hidden = true;
+  const errorBus = createErrorBus();
+  const notificationStore = createNotificationStore();
+
+  let activeView = "audit";
+  let auditFilter = "all";
+  let panelHideTimer = null;
+  let hintsEnabled = Boolean(initialHintsEnabled);
+
+  function t(key, params = {}) {
+    return typeof getUiText === "function" ? getUiText(key, params) : key;
   }
 
-  function open() {
-    const issues = collectIssues(state);
-    els.dataQualityPanel.hidden = false;
-    els.dataQualitySummary.textContent = issues.length
-      ? `Нашёл ${issues.length} мест, которые стоит проверить перед публикацией или показом игрокам.`
-      : "Выглядит чисто: явных заглушек, дублей и тяжёлых ссылок не найдено.";
+  function syncHintsButtons() {
+    if (els.toggleEditorHintsButton) {
+      els.toggleEditorHintsButton.textContent = t(hintsEnabled ? "info_hints_on" : "info_hints_off");
+    }
+    if (els.dataQualityHintsToggleButton) {
+      els.dataQualityHintsToggleButton.textContent = t(
+        hintsEnabled ? "info_hints_toggle_disable" : "info_hints_toggle_enable",
+      );
+    }
+    state.editorHintsEnabled = hintsEnabled;
+  }
 
-    renderIssuesList(els, issues, onNavigate, close);
+  function showToast(notification) {
+    if (!els.runtimeToastStack) return;
+    els.runtimeToastStack.hidden = false;
+    const toast = document.createElement("button");
+    toast.className = `runtime-toast runtime-toast-${notification.level}`;
+    toast.type = "button";
+
+    const title = document.createElement("strong");
+    title.textContent = notification.title;
+    const text = document.createElement("span");
+    text.textContent = notification.message;
+    const action = document.createElement("em");
+    action.textContent = t("info_open_diagnostics");
+
+    toast.append(title, text, action);
+    toast.addEventListener("click", () => {
+      open("notifications");
+      toast.remove();
+      if (!els.runtimeToastStack.children.length) els.runtimeToastStack.hidden = true;
+    });
+
+    els.runtimeToastStack.appendChild(toast);
+    window.setTimeout(() => toast.classList.add("is-visible"), 20);
+    window.setTimeout(() => {
+      toast.classList.remove("is-visible");
+      window.setTimeout(() => {
+        toast.remove();
+        if (!els.runtimeToastStack.children.length) els.runtimeToastStack.hidden = true;
+      }, 220);
+    }, 5200);
+  }
+
+  function addNotification(entry, options = {}) {
+    const notification = notificationStore.add(entry);
+    if (!notification) return null;
+    if (options.toast !== false) showToast(notification);
+    if (activeView === "notifications" && !els.dataQualityPanel.hidden) render();
+    return notification;
+  }
+
+  errorBus.subscribe((entry) => {
+    addNotification(
+      {
+        level: entry.level,
+        title: entry.title,
+        message: entry.message || entry.source,
+        source: entry.source,
+        details: entry.details,
+      },
+      { toast: entry.level !== "info" },
+    );
+    if (activeView === "logs" && !els.dataQualityPanel.hidden) render();
+  });
+
+  function getAuditIssues() {
+    const issues = runAudit(state);
+    if (auditFilter === "all") return issues;
+    return issues.filter((issue) => fixMojibake(issue.scope) === auditFilter);
+  }
+
+  function renderAuditView() {
+    const allIssues = runAudit(state);
+    const scopes = [...new Set(allIssues.map((issue) => fixMojibake(issue.scope)).filter(Boolean))]
+      .map((scope) => ({
+        value: scope,
+        label: formatIssue({ scope, code: "", message: "" }, state, getUiText).scopeLabel,
+      }));
+    renderAuditFilters(els, scopes, auditFilter, (nextScope) => {
+      auditFilter = nextScope;
+      render();
+    }, getUiText);
+
+    applyPanelHeading(
+      els,
+      t("info_center_kicker"),
+      t("audit_title"),
+      allIssues.length ? t("audit_summary", { count: allIssues.length }) : t("audit_empty_text"),
+    );
+    renderIssuesList(els, getAuditIssues(), onNavigate, close, getUiText, state);
+  }
+
+  function renderLogsView() {
+    resetFilters(els);
+    applyPanelHeading(els, t("info_center_kicker"), t("info_logs_title"), t("info_logs_summary"));
+    renderRuntimeList(els, errorBus.getEntries(), t("info_logs_empty"));
+  }
+
+  function renderNotificationsView() {
+    resetFilters(els);
+    applyPanelHeading(
+      els,
+      t("info_center_kicker"),
+      t("info_notifications_title"),
+      t("info_notifications_summary"),
+    );
+    renderRuntimeList(els, notificationStore.getAll(), t("info_notifications_empty"));
+  }
+
+  function renderHintsTab() {
+    resetFilters(els);
+    applyPanelHeading(els, t("info_center_kicker"), t("info_hints_title"), t("info_hints_summary"));
+    renderHintsView(els, getUiText, hintsEnabled, state);
+  }
+
+  function render() {
+    const tabs = els.dataQualityTabs?.querySelectorAll?.("[data-info-view]") || [];
+    tabs.forEach((button) => button.classList.toggle("is-active", button.dataset.infoView === activeView));
+    syncHintsButtons();
+
+    if (activeView === "audit") return renderAuditView();
+    if (activeView === "logs") return renderLogsView();
+    if (activeView === "notifications") return renderNotificationsView();
+    return renderHintsTab();
+  }
+
+  function close() {
+    els.dataQualityPanel.classList.remove("is-open");
+    window.clearTimeout(panelHideTimer);
+    panelHideTimer = window.setTimeout(() => {
+      els.dataQualityPanel.hidden = true;
+    }, 220);
+  }
+
+  function open(view = "audit") {
+    activeView = INFO_VIEWS.has(view) ? view : "audit";
+    els.dataQualityPanel.hidden = false;
+    window.clearTimeout(panelHideTimer);
+    render();
+    requestAnimationFrame(() => {
+      els.dataQualityPanel.classList.add("is-open");
+    });
+  }
+
+  function toggleHints() {
+    hintsEnabled = !hintsEnabled;
+    syncHintsButtons();
+    onHintsEnabledChange?.(hintsEnabled);
+    if (!els.dataQualityPanel.hidden && activeView === "hints") render();
+  }
+
+  function setHintsEnabled(nextValue) {
+    hintsEnabled = Boolean(nextValue);
+    syncHintsButtons();
+    if (!els.dataQualityPanel.hidden && activeView === "hints") render();
+  }
+
+  function reportRuntimeEvent(entry) {
+    return errorBus.emit(entry);
   }
 
   function setup() {
+    els.validateDataButton.addEventListener("click", () => open("audit"));
+    els.openRuntimeLogsButton?.addEventListener("click", () => open("logs"));
+    els.openRuntimeNotificationsButton?.addEventListener("click", () => open("notifications"));
+    els.toggleEditorHintsButton?.addEventListener("click", toggleHints);
+    els.dataQualityHintsToggleButton?.addEventListener("click", toggleHints);
     els.dataQualityCloseButton.addEventListener("click", close);
     els.dataQualityPanel.addEventListener("click", (event) => {
       if (event.target === els.dataQualityPanel) close();
     });
+    els.dataQualityTabs?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-info-view]");
+      if (!button) return;
+      open(button.dataset.infoView || "audit");
+    });
+    els.dataQualityList.addEventListener("click", (event) => {
+      const toggleButton = event.target.closest("[data-hints-toggle='true']");
+      if (toggleButton) {
+        toggleHints();
+        return;
+      }
+      const resetButton = event.target.closest("[data-hints-reset='true']");
+      if (resetButton) {
+        onResetHints?.();
+        render();
+      }
+    });
+    syncHintsButtons();
   }
 
   return {
     close,
     open,
     setup,
+    refresh: render,
+    reportRuntimeEvent,
+    setHintsEnabled,
   };
 }

@@ -5,7 +5,7 @@ import { getLocalizedText, normalizeTranslationsMap } from "./localization.js";
 export const DEFAULT_MAP_VIEWS = Object.freeze([
   {
     id: "author",
-    label: "Авторский",
+    label: "\u0410\u0432\u0442\u043e\u0440\u0441\u043a\u0438\u0439",
     textureKey: "author",
     userVisible: true,
     translations: {
@@ -16,7 +16,7 @@ export const DEFAULT_MAP_VIEWS = Object.freeze([
   },
   {
     id: "vector",
-    label: "Вектор",
+    label: "\u0412\u0435\u043a\u0442\u043e\u0440",
     textureKey: "interactive",
     userVisible: true,
     translations: {
@@ -27,7 +27,7 @@ export const DEFAULT_MAP_VIEWS = Object.freeze([
   },
   {
     id: "vector-colored",
-    label: "Вектор + цвет",
+    label: "\u0412\u0435\u043a\u0442\u043e\u0440 + \u0446\u0432\u0435\u0442",
     textureKey: "interactive",
     userVisible: true,
     translations: {

@@ -47,7 +47,7 @@ export function createCompactTopbarMenusController({ els, state }) {
     mapConfigMenuPopover.hidden = true;
 
     mapConfigMenu.append(mapConfigMenuButton, mapConfigMenuPopover);
-    els.topbar.querySelector(".topbar-right")?.insertBefore(mapConfigMenu, els.activeMapToggleButton);
+    els.topbar.querySelector(".topbar-right")?.appendChild(mapConfigMenu);
     if (els.mapViewEditorTools) {
       mapConfigMenuPopover.appendChild(els.mapViewEditorTools);
     }
@@ -73,7 +73,7 @@ export function createCompactTopbarMenusController({ els, state }) {
 
     dataToolsMenu.append(dataToolsMenuButton, dataToolsMenuPopover);
     els.topbar.querySelector(".topbar-right")?.appendChild(dataToolsMenu);
-    [els.uploadMapTextureButton, els.exportDataButton, els.importDataButton, els.exportActiveMapButton]
+    [els.uploadMapTextureButton, els.exportDataButton, els.importDataButton]
       .filter(Boolean)
       .forEach((element) => {
         element.classList.add("topbar-menu-action");
@@ -86,7 +86,7 @@ export function createCompactTopbarMenusController({ els, state }) {
     // mode, because some tools make sense only on the base map.
     ensure();
     const showMapConfigMenu = Boolean(
-      state.editMode && !state.timelineMode && !state.archiveMode && !state.homebrewMode && !state.heroesMode && !state.activeMapMode,
+      state.editMode && !state.timelineMode && !state.archiveMode && !state.homebrewMode && !state.heroesMode,
     );
     if (mapConfigMenu) mapConfigMenu.hidden = !showMapConfigMenu;
 
@@ -96,7 +96,6 @@ export function createCompactTopbarMenusController({ els, state }) {
         !els.uploadMapTextureButton.hidden
         || !els.exportDataButton.hidden
         || !els.importDataButton.hidden
-        || !els.exportActiveMapButton.hidden
       ),
     );
     if (dataToolsMenu) dataToolsMenu.hidden = !showDataToolsMenu;

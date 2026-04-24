@@ -5,7 +5,7 @@ export function createMapModule(els, state, ui) {
   const FALLBACK_MIN_MAP_SCALE = 0.6;
   const BASE_IMAGE_MIN_MAP_SCALE = 1;
   const MAX_MAP_SCALE = 4;
-  const MAP_INTERACTIVE_TARGETS = ".marker, .active-map-marker, .region-label, .active-route-hit, .active-route-line";
+  const MAP_INTERACTIVE_TARGETS = ".marker, .region-label";
 
   // If the current map mode has a real texture, we keep the user from zooming
   // out far enough to expose empty space around the image.
@@ -36,7 +36,7 @@ export function createMapModule(els, state, ui) {
 
   function applyMapTransform() {
     // All overlays sit inside the same transformed layer, so one transform keeps
-    // map art, labels, markers, and active-map elements visually aligned.
+    // map art, labels, and markers visually aligned.
     state.mapScale = clamp(state.mapScale, getMinMapScale(), MAX_MAP_SCALE);
     constrainMapOffsetToImageBounds();
     els.mapTransform.style.transform = `translate(${state.mapOffsetX}px, ${state.mapOffsetY}px) scale(${state.mapScale})`;
@@ -74,13 +74,7 @@ export function createMapModule(els, state, ui) {
       const isMarker = event.target.classList.contains("marker");
       if (isMarker) return;
       const interactiveTarget = event.target.closest(MAP_INTERACTIVE_TARGETS);
-      const routeDrawingPointer =
-        state.activeMapMode
-        && state.editMode
-        && state.activeMapTool === "route"
-        && event.button === 0
-        && !interactiveTarget;
-      if (routeDrawingPointer) return;
+      if (interactiveTarget) return;
 
       if (state.editMode && event.button === 0 && event.target !== els.mapStage && event.target !== els.mapTransform) {
         return;

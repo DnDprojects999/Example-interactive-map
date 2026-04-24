@@ -5,70 +5,130 @@
       "year": "1 AGE",
       "title": "Основание Серконии",
       "description": "Первые города закрепляются на торговых путях и объединяют прибрежные земли.",
-      "position": "up"
+      "position": "up",
+      "translations": {
+        "en": {
+          "title": "Founding of Serkonia",
+          "description": "The first cities secure the trade routes and unite the coastal lands."
+        }
+      }
     },
     {
       "id": "war-of-three-banners",
       "year": "2 AGE",
       "title": "Война трёх знамён",
       "description": "Старые дома делят власть, а границы впервые начинают двигаться на юг.",
-      "position": "down"
+      "position": "down",
+      "translations": {
+        "en": {
+          "title": "War of the Three Banners",
+          "description": "The old houses split power, and the borders begin to shift south for the first time."
+        }
+      }
     },
     {
       "id": "age-of-schism",
       "year": "3 AGE",
       "title": "Эпоха раскола",
       "description": "Фракции рвут страну изнутри, после чего остаются руины, культы и потерянные архивы.",
-      "position": "up"
+      "position": "up",
+      "translations": {
+        "en": {
+          "title": "Age of Schism",
+          "description": "Factions tear the realm apart from within, leaving behind ruins, cults, and lost archives."
+        }
+      }
     },
     {
       "id": "campaign-start",
       "year": "NOW",
       "title": "Начало кампании",
       "description": "Текущая точка, от которой уже можно вести игроков в активные события мира.",
-      "position": "down"
+      "position": "down",
+      "translations": {
+        "en": {
+          "title": "Campaign Begins",
+      "description": "The current point in time, where players can already be led into the living events of the world."
+        }
+      }
     },
     {
       "id": "ashen-winter",
       "year": "NOW + 2",
       "title": "Пепельная зима",
       "description": "После извержения в Северной гряде небо темнеет, а города переходят на военные запасы.",
-      "position": "up"
+      "position": "up",
+      "translations": {
+        "en": {
+          "title": "Ashen Winter",
+          "description": "After an eruption in the Northern Ridge, the sky darkens and the cities switch to wartime reserves."
+        }
+      }
     },
     {
       "id": "guild-union",
       "year": "NOW + 4",
       "title": "Союз гильдий",
       "description": "Торговые дома объединяют флотилии, чтобы вернуть контроль над западными проливами.",
-      "position": "down"
+      "position": "down",
+      "translations": {
+        "en": {
+          "title": "Guild Union",
+          "description": "Merchant houses unite their flotillas to reclaim control over the western straits."
+        }
+      }
     },
     {
       "id": "archivist-expedition",
       "year": "NOW + 7",
       "title": "Экспедиция архивистов",
       "description": "На южных руинах находят запечатанные залы и первые карты допотопных форпостов.",
-      "position": "up"
+      "position": "up",
+      "translations": {
+        "en": {
+          "title": "Archivists' Expedition",
+          "description": "Sealed halls and the first maps of pre-flood outposts are discovered in the southern ruins."
+        }
+      }
     },
     {
       "id": "scarlet-plague",
       "year": "NOW + 9",
       "title": "Алая чума",
       "description": "Через портовые кварталы проходит новая болезнь, из-за чего регионы вводят карантин.",
-      "position": "down"
+      "position": "down",
+      "translations": {
+        "en": {
+          "title": "Scarlet Plague",
+          "description": "A new disease spreads through the harbor districts, forcing regions to impose quarantines."
+        }
+      }
     },
     {
       "id": "throne-claim",
       "year": "NOW + 11",
       "title": "Претензия на трон",
       "description": "Неизвестный наследник собирает сторонников и требует пересмотра старых договоров домов.",
-      "position": "up"
+      "position": "up",
+      "translations": {
+        "en": {
+          "title": "Claim to the Throne",
+          "description": "An unknown heir gathers supporters and demands a revision of the ancient house treaties."
+        }
+      }
     },
     {
       "id": "storm-citadels",
       "year": "NOW + 13",
       "title": "Шторм над цитаделями",
       "description": "Магические маяки начинают сбоить, и прибрежные крепости переходят в режим тревоги.",
-      "position": "down"
+      "position": "down",
+      "translations": {
+        "en": {
+          "title": "Storm over the Citadels",
+          "description": "Arcane beacons begin to fail, and the coastal fortresses go into full alert."
+        }
+      }
     }
   ]
 }

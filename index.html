@@ -8,9 +8,9 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Oxanium:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="css/style.css?v=20260416-bootfix" />
+  <link rel="stylesheet" href="css/style.css?v=20260424-section-visibility" />
   <script>
     // Set to true if you want editor mode to be available to everyone on the
     // published site. Keep false for a player-facing public version.
@@ -24,12 +24,13 @@
   <div class="loading-screen" id="loadingScreen">
     <div class="loading-kicker" id="loadingKicker">Chronicles of Serkonia</div>
     <div class="loading-sigil-wrap">
+      <div class="loading-artwork" id="loadingArtwork" hidden></div>
       <div class="loading-sigil" id="loadingSigil">S</div>
     </div>
     <div class="loading-title" id="loadingTitle">Добро пожаловать в Серконию</div>
-    <div class="loading-subtitle" id="loadingSubtitle">Открываем хронику и поднимаем архивы мира.</div>
+    <div class="loading-subtitle" id="loadingSubtitle">Открываем хроники и поднимаем архивы мира.</div>
     <div class="loading-line"></div>
-    <div class="loading-note" id="loadingNote">Подготавливаем карту, героев, активные события и всё, что вы успели натворить.</div>
+    <div class="loading-note" id="loadingNote">Подготавливаем карты, героев, хроники и всё, что вы успели натворить.</div>
   </div>
 
   <!-- Global topbar shared by map, timeline, archive, heroes, and homebrew modes. -->
@@ -55,7 +56,7 @@
           <button class="ghost-btn" id="addLanguageButton" type="button">+ Язык</button>
           <button class="ghost-btn" id="toggleLanguageVisibilityButton" type="button">Скрыть кнопку</button>
         </div>
-        <button class="ghost-btn topbar-tool-btn" id="deleteMapViewButton" type="button">РЈРґР°Р»РёС‚СЊ СЂРµР¶РёРј</button>
+        <button class="ghost-btn topbar-tool-btn" id="deleteMapViewButton" type="button">Удалить текущий режим</button>
       </div>
     </div>
 
@@ -63,7 +64,7 @@
       <button class="mode-link mode-link-secondary homebrew-map-button" id="homebrewMapButton" type="button">Map</button>
       <label class="homebrew-search-wrap" for="homebrewSearchInput">
         <span class="homebrew-search-icon">?</span>
-        <input class="homebrew-search-input" id="homebrewSearchInput" type="search" placeholder="РџРѕРёСЃРє РїРѕ homebrew" autocomplete="off" />
+        <input class="homebrew-search-input" id="homebrewSearchInput" type="search" placeholder="Поиск по homebrew" autocomplete="off" />
       </label>
       <div class="homebrew-language-switcher">
         <button class="language-toggle homebrew-language-toggle" id="homebrewLanguageButton" type="button" aria-haspopup="true" aria-expanded="false">
@@ -80,14 +81,73 @@
       <button class="mode-link" id="archiveOpenButton">Archive</button>
       <button class="mode-link" id="homebrewOpenButton">Homebrew</button>
       <button class="mode-link" id="heroesOpenButton">Hall of Heroes</button>
+      <div class="audio-switcher" id="audioSwitcher">
+        <button class="language-toggle audio-toggle" id="audioToggleButton" type="button" aria-haspopup="true" aria-expanded="false">
+          <span class="audio-toggle-label" id="audioToggleLabel">♫</span>
+        </button>
+        <div class="audio-popover" id="audioPopover" hidden>
+          <div class="audio-popover-kicker" id="audioPopoverKicker">Sound</div>
+          <div class="audio-toggle-row">
+            <button class="ghost-btn audio-menu-toggle" id="audioEnabledButton" type="button">Sound: On</button>
+            <button class="ghost-btn audio-menu-toggle" id="audioUiButton" type="button">UI: On</button>
+            <button class="ghost-btn audio-menu-toggle" id="audioAmbienceButton" type="button">Ambience: On</button>
+          </div>
+          <label class="audio-menu-field">
+            <span id="audioMasterLabel">Master volume</span>
+            <input id="audioMasterVolumeInput" type="range" min="0" max="100" step="1" value="60" />
+          </label>
+          <label class="audio-menu-field">
+            <span id="audioUiVolumeLabel">UI volume</span>
+            <input id="audioUiVolumeInput" type="range" min="0" max="100" step="1" value="55" />
+          </label>
+          <label class="audio-menu-field">
+            <span id="audioAmbienceVolumeLabel">Ambience volume</span>
+            <input id="audioAmbienceVolumeInput" type="range" min="0" max="100" step="1" value="42" />
+          </label>
+          <div class="audio-editor-section" id="audioEditorSection" hidden>
+            <div class="audio-editor-kicker" id="audioEditorKicker">Editor</div>
+            <label class="audio-menu-field audio-editor-field">
+              <span id="audioModeTargetLabel">Ambience target</span>
+              <select id="audioModeTargetSelect">
+                <option value="map">Map</option>
+                <option value="timeline">Timeline</option>
+                <option value="archive">Archive</option>
+                <option value="homebrew">Homebrew</option>
+                <option value="heroes">Hall of Heroes</option>
+              </select>
+            </label>
+            <div class="audio-mode-status" id="audioModeStatus">Built-in ambience</div>
+            <div class="audio-editor-actions">
+              <button class="ghost-btn audio-menu-toggle" id="audioPreviewClickButton" type="button">Preview click</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioPreviewOpenButton" type="button">Preview open</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioPreviewAmbienceButton" type="button">Preview ambience</button>
+            </div>
+            <div class="audio-editor-actions">
+              <button class="ghost-btn audio-menu-toggle" id="audioUploadUiButton" type="button">Upload UI sound</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioClearUiButton" type="button">Clear UI sound</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioUploadOpenButton" type="button">Upload open sound</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioClearOpenButton" type="button">Clear open sound</button>
+            </div>
+            <div class="audio-editor-actions">
+              <button class="ghost-btn audio-menu-toggle" id="audioSaveDefaultsButton" type="button">Save as site default</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioResetLocalButton" type="button">Reset local</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioUploadAmbienceButton" type="button">Upload ambience</button>
+              <button class="ghost-btn audio-menu-toggle" id="audioClearAmbienceButton" type="button">Clear ambience</button>
+            </div>
+            <input id="audioUiFileInput" type="file" accept="audio/*" hidden />
+            <input id="audioOpenFileInput" type="file" accept="audio/*" hidden />
+            <input id="audioAmbienceFileInput" type="file" accept="audio/*" hidden />
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="topbar-right">
       <div class="homebrew-topbar-right">
         <div class="homebrew-type-switch" id="homebrewTypeSwitch">
-          <button class="mode-link homebrew-type-button" type="button" data-homebrew-type="change">РР·РјРµРЅРµРЅРёСЏ</button>
-          <button class="mode-link homebrew-type-button" type="button" data-homebrew-type="new">РќРѕРІРѕРµ</button>
-          <button class="mode-link homebrew-type-button" type="button" data-homebrew-type="rule">РџСЂР°РІРёР»Р°</button>
+          <button class="mode-link homebrew-type-button" type="button" data-homebrew-type="change">Изменения</button>
+          <button class="mode-link homebrew-type-button" type="button" data-homebrew-type="new">Новое</button>
+          <button class="mode-link homebrew-type-button" type="button" data-homebrew-type="rule">Правила</button>
         </div>
       </div>
       <div class="map-view-switcher" id="mapViewSwitcher" aria-label="Режим отображения карты">
@@ -100,28 +160,57 @@
         <button class="ghost-btn topbar-tool-btn" id="editMapViewsButton" type="button">Режимы карты</button>
       </div>
       <button class="ghost-btn topbar-tool-btn" id="deleteMapViewModeButton" type="button" hidden>Delete mode</button>
-      <button class="mode-link mode-link-secondary" id="activeMapToggleButton" type="button">Active Map</button>
       <button class="mode-link mode-link-secondary map-return" id="mapReturnButton" type="button" hidden>Map</button>
-      <button class="btn" id="uploadMapTextureButton" hidden>Заливка карты</button>
+      <button class="btn" id="uploadMapTextureButton" hidden>Текстура карты</button>
       <input id="mapTextureInput" type="file" accept="image/*" hidden />
       <button class="btn" id="exportDataButton" hidden>Экспорт JSON</button>
       <button class="btn" id="importDataButton" hidden>Импорт JSON</button>
       <input id="importDataInput" type="file" accept="application/json,.json" hidden />
-      <button class="btn" id="exportActiveMapButton" hidden>Экспорт Active Map</button>
     </div>
+    <div class="topbar-tech-readout" id="topbarTechReadout" aria-live="polite">SYS//READY</div>
   </header>
+
+  <div class="section-visibility-drawer" id="sectionVisibilityDrawer" hidden>
+    <button class="section-visibility-toggle" id="sectionVisibilityToggleButton" type="button" aria-expanded="false">
+      <span id="sectionVisibilityToggleLabel">Sections</span>
+      <span aria-hidden="true">▾</span>
+    </button>
+    <div class="section-visibility-panel" id="sectionVisibilityPanel" hidden>
+      <div class="section-visibility-heading" id="sectionVisibilityTitle">Visible sections</div>
+      <div class="section-visibility-note" id="sectionVisibilityHint">Hidden sections disappear for users, but stay available in editor mode.</div>
+      <div class="section-visibility-options" id="sectionVisibilityOptions">
+        <label class="section-visibility-option">
+          <span id="sectionVisibilityTimelineLabel">Timeline</span>
+          <input type="checkbox" data-section-visibility="timeline" checked />
+          <span class="section-visibility-switch" aria-hidden="true"></span>
+        </label>
+        <label class="section-visibility-option">
+          <span id="sectionVisibilityArchiveLabel">Archive</span>
+          <input type="checkbox" data-section-visibility="archive" checked />
+          <span class="section-visibility-switch" aria-hidden="true"></span>
+        </label>
+        <label class="section-visibility-option">
+          <span id="sectionVisibilityHomebrewLabel">Homebrew</span>
+          <input type="checkbox" data-section-visibility="homebrew" checked />
+          <span class="section-visibility-switch" aria-hidden="true"></span>
+        </label>
+        <label class="section-visibility-option">
+          <span id="sectionVisibilityHeroesLabel">Hall of Heroes</span>
+          <input type="checkbox" data-section-visibility="heroes" checked />
+          <span class="section-visibility-switch" aria-hidden="true"></span>
+        </label>
+      </div>
+    </div>
+  </div>
 
   <!-- Main application workspace: left tools, center content, right details panel. -->
   <div class="workspace">
     <aside class="sidebar">
-      <button class="sidebar-search-button" id="globalSearchButton" type="button" title="Поиск по Серконии">⌕</button>
+      <button class="sidebar-search-button" id="globalSearchButton" type="button" title="Поиск по миру">⌕</button>
       <div class="sidebar-title" id="sidebarTitle">Слои</div>
       <div class="palette-widget" id="paletteWidget">
-        <button class="palette-toggle" id="paletteToggle" type="button" title="Сменить палитру">🎨</button>
+        <button class="palette-toggle" id="paletteToggle" type="button" title="Палитра">🎨</button>
         <div class="palette-popover" id="palettePopover" hidden>
-          <button class="palette-option" type="button" data-palette-value="ember">Ember</button>
-          <button class="palette-option" type="button" data-palette-value="night">Night</button>
-          <button class="palette-option" type="button" data-palette-value="frost">Frost</button>
           <button class="palette-option" id="addPaletteButton" type="button" hidden>+ Add palette</button>
         </div>
       </div>
@@ -181,7 +270,7 @@
         <button class="player-popout-secondary" id="clearNotesButton" type="button">Очистить</button>
       </div>
     </aside>
-    <button class="sidebar-legend-toggle" id="sidebarLegendToggle" type="button" aria-label="Показать легенду">›</button>
+    <button class="sidebar-legend-toggle" id="sidebarLegendToggle" type="button" aria-label="Показать или скрыть легенду">‹</button>
     <div class="sidebar-legend-panel" id="sidebarLegendPanel" hidden>
       <div class="sidebar-legend-header">
         <span class="sidebar-legend-kicker">Legend</span>
@@ -193,6 +282,12 @@
 
     <!-- Center content swaps between map, timeline, archive, homebrew, and heroes. -->
     <div class="content panel-open" id="content">
+      <aside class="tech-console" id="techConsole" hidden aria-hidden="true">
+        <div class="tech-console-frame">
+          <div class="tech-console-kicker">SYS LOG</div>
+          <div class="tech-console-lines" id="techConsoleLines" aria-live="polite"></div>
+        </div>
+      </aside>
       <div class="map-shell">
         <div class="map-stage" id="mapStage">
           <div class="map-transform" id="mapTransform">
@@ -201,10 +296,8 @@
             <div class="map-fog"></div>
 
             <svg id="drawSvg" class="draw-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
-            <svg id="activeMapSvg" class="active-map-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
             <div id="regionLabelsContainer" class="region-labels"></div>
             <div id="markersContainer"></div>
-            <div id="activeMarkersContainer" class="active-markers"></div>
           </div>
         </div>
       </div>
@@ -267,16 +360,20 @@
         <header class="heroes-hero">
           <button class="heroes-home" id="heroesHomeButton" type="button">Home</button>
           <p class="heroes-kicker" id="heroesKicker">Chronicles of Serkonia</p>
-          <h1 id="heroesTitle">Hall of Heroes · Serkonia</h1>
+          <h1 id="heroesTitle">Hall of Heroes • Serkonia</h1>
           <p class="heroes-intro" id="heroesIntro">
             Герои, союзники, легенды и важные лица кампании. Каждая карточка хранит историю того, кто уже оставил след в Серконии.
           </p>
+          <div class="heroes-editor-tools" id="heroesEditorTools" hidden>
+            <button class="ghost-btn topbar-tool-btn" id="heroesAddHeroGroupButton" type="button">+ Group</button>
+            <button class="ghost-btn topbar-tool-btn" id="heroesAddHeroCardButton" type="button">+ Hero</button>
+          </div>
         </header>
         <div class="heroes-groups" id="heroesGroupsContainer"></div>
       </section>
 
       <aside class="info-panel" id="infoPanel">
-        <div class="panel-handle" id="panelHandle">◀</div>
+        <div class="panel-handle" id="panelHandle">▸</div>
 
         <div class="panel-inner">
           <div class="panel-top">
@@ -291,7 +388,7 @@
           <div class="panel-image" id="panelImage">
             <img class="panel-image-preview" id="panelImagePreview" alt="Превью" hidden />
             <div class="panel-image-caption" id="panelImageCaption">
-              Здесь позже может быть портрет города, герб, карта региона или иллюстрация точки интереса
+              Здесь позже может быть портрет города, герб, карта региона или иллюстрация точки интереса.
             </div>
           </div>
 
@@ -306,7 +403,7 @@
           </div>
 
           <div class="panel-text" id="panelText">
-            Сейчас это тестовая панель. Нажми на любую метку на карте, и здесь появится информация о ней.
+            Сейчас это информационная панель. Нажми на любую метку на карте, и здесь появится информация о ней.
           </div>
 
           <button class="panel-timeline-link" id="panelTimelineEventButton" type="button" hidden>Открыть событие на таймлайне</button>
@@ -319,20 +416,101 @@
       </aside>
 
       <div class="editor-actions" id="editorActions" hidden>
-        <button class="editor-action-btn" id="addRegionLabelButton" type="button" hidden>+ Подпись региона</button>
-        <button class="editor-action-btn" id="toggleTextMoveModeButton" type="button" hidden>↔ Перемещение текста</button>
-        <button class="editor-action-btn" id="toggleDrawModeButton" type="button" hidden>✎ Рисование</button>
-        <button class="editor-action-btn" id="validateDataButton" type="button" hidden>Проверка</button>
-        <button class="editor-action-btn" id="editLoadingScreenButton" type="button" hidden>Загрузка</button>
-        <button class="editor-action-btn" id="previewLoadingScreenButton" type="button" hidden>Превью загрузки</button>
-        <button class="editor-action-btn" id="addTimelineEventButton" type="button" hidden>+ Событие</button>
-        <button class="editor-action-btn" id="addArchiveGroupButton" type="button" hidden>+ Глава архива</button>
-        <button class="editor-action-btn" id="addArchiveItemButton" type="button" hidden>+ Карточка архива</button>
-        <button class="editor-action-btn" id="addHeroGroupButton" type="button" hidden>+ Группа героев</button>
-        <button class="editor-action-btn" id="addHeroCardButton" type="button" hidden>+ Герой</button>
-        <button class="editor-action-btn" id="addActiveMarkerButton" type="button" hidden>+ Событие</button>
-        <button class="editor-action-btn" id="addActiveRouteButton" type="button" hidden>↝ Маршрут</button>
-        <button class="editor-action-btn" id="toggleActivePinsButton" type="button" hidden>Базовые метки</button>
+        <div class="editor-shell-head">
+          <div class="editor-shell-copy">
+            <span class="editor-shell-kicker" id="editorShellKicker">Editor</span>
+            <strong class="editor-shell-title" id="editorShellTitle">Editor tools</strong>
+          </div>
+          <div class="editor-shell-head-actions">
+            <div class="editor-theme-picker" id="editorThemePicker">
+              <button class="editor-theme-button" id="editorThemeButton" type="button" aria-haspopup="true" aria-expanded="false">
+                <span class="editor-theme-button-label" id="editorThemeButtonLabel">Style</span>
+              </button>
+              <div class="editor-theme-popover" id="editorThemePopover" hidden>
+                <div class="editor-theme-popover-title" id="editorThemeTitle">Site style</div>
+                <div class="editor-theme-options" id="editorThemeOptions"></div>
+              </div>
+            </div>
+          </div>
+          <button class="editor-shell-toggle" id="editorShellToggleButton" type="button" aria-expanded="true">▾</button>
+        </div>
+
+        <div class="editor-shell-grid">
+          <section class="editor-shell-section editor-shell-section-diagnostics" id="editorDiagnosticsSection">
+            <span class="editor-shell-section-label" id="editorDiagnosticsLabel">Information</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn editor-action-btn-primary" id="validateDataButton" type="button" hidden>Audit</button>
+              <button class="editor-action-btn" id="openRuntimeLogsButton" type="button" hidden>Logs</button>
+              <button class="editor-action-btn" id="openRuntimeNotificationsButton" type="button" hidden>Notifications</button>
+              <button class="editor-action-btn" id="toggleEditorHintsButton" type="button" hidden>Hints: Off</button>
+            </div>
+          </section>
+
+          <section class="editor-shell-section" id="editorWorldSection">
+            <span class="editor-shell-section-label" id="editorWorldLabel">World</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn" id="editLoadingScreenButton" type="button" hidden>Loading</button>
+              <button class="editor-action-btn" id="previewLoadingScreenButton" type="button" hidden>Preview</button>
+              <button class="editor-action-btn" id="uploadLoadingScreenImageButton" type="button" hidden>Loading image</button>
+              <button class="editor-action-btn editor-icon-action-btn" id="uploadFaviconButton" type="button" hidden>Icon</button>
+              <input id="faviconInput" type="file" accept="image/*" hidden />
+            </div>
+          </section>
+
+          <section class="editor-shell-section" id="editorMapSection">
+            <span class="editor-shell-section-label" id="editorMapLabel">Map</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn" id="addRegionLabelButton" type="button" hidden>Add region label</button>
+              <button class="editor-action-btn" id="toggleTextMoveModeButton" type="button" hidden>Move text</button>
+              <button class="editor-action-btn" id="toggleDrawModeButton" type="button" hidden>Draw</button>
+              <button class="editor-action-btn" id="editorLegendButton" type="button" hidden>Edit legend</button>
+            </div>
+          </section>
+
+          <section class="editor-shell-section" id="editorTimelineSection">
+            <span class="editor-shell-section-label" id="editorTimelineLabel">Timeline</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn" id="addTimelineEventButton" type="button" hidden>Add event</button>
+              <button class="editor-action-btn" id="editorAddTimelineActButton" type="button" hidden>Add act</button>
+              <button class="editor-action-btn" id="editorEditTimelineActButton" type="button" hidden>Edit act</button>
+              <button class="editor-action-btn" id="editorDeleteTimelineActButton" type="button" hidden>Delete act</button>
+              <button class="editor-action-btn" id="editorTimelineBackdropButton" type="button" hidden>Act backdrop</button>
+            </div>
+          </section>
+
+          <section class="editor-shell-section" id="editorArchiveSection">
+            <span class="editor-shell-section-label" id="editorArchiveLabel">Archive</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn" id="addArchiveGroupButton" type="button" hidden>Add chapter</button>
+              <button class="editor-action-btn" id="addArchiveItemButton" type="button" hidden>Add card</button>
+            </div>
+          </section>
+
+          <section class="editor-shell-section" id="editorHeroesSection">
+            <span class="editor-shell-section-label" id="editorHeroesLabel">Heroes</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn" id="addHeroGroupButton" type="button" hidden>Add group</button>
+              <button class="editor-action-btn" id="addHeroCardButton" type="button" hidden>Add hero</button>
+            </div>
+          </section>
+
+          <section class="editor-shell-section" id="editorHomebrewSection">
+            <span class="editor-shell-section-label" id="editorHomebrewLabel">Homebrew</span>
+            <div class="editor-shell-actions-row">
+              <button class="editor-action-btn" id="editorAddHomebrewCategoryButton" type="button" hidden>Add category</button>
+              <button class="editor-action-btn" id="editorAddHomebrewArticleButton" type="button" hidden>Add article</button>
+            </div>
+          </section>
+
+        </div>
+
+        <div class="editor-shell-proxy-bin" aria-hidden="true">
+          <button class="editor-action-btn" id="editorManageMapViewsButton" type="button" hidden>Map modes</button>
+          <button class="editor-action-btn" id="editorToggleMapViewSwitcherButton" type="button" hidden>Players toggle</button>
+          <button class="editor-action-btn" id="editorUploadMapTextureButton" type="button" hidden>Map texture</button>
+          <button class="editor-action-btn" id="editorExportDataButton" type="button" hidden>Export JSON</button>
+          <button class="editor-action-btn" id="editorImportDataButton" type="button" hidden>Import JSON</button>
+        </div>
       </div>
 
       <div class="map-text-toolbar" id="mapTextToolbar" hidden>
@@ -341,7 +519,7 @@
         <button id="mapTextBoldButton" type="button"><b>B</b></button>
         <button id="mapTextItalicButton" type="button"><i>I</i></button>
         <input id="mapTextColorInput" type="color" />
-        <label>⟳ <input id="mapTextRotateInput" type="range" min="-180" max="180" step="1" /></label>
+        <label>↻ <input id="mapTextRotateInput" type="range" min="-180" max="180" step="1" /></label>
         <label>X <input id="mapTextXInput" type="range" min="0" max="100" step="0.1" /></label>
         <label>Y <input id="mapTextYInput" type="range" min="0" max="100" step="0.1" /></label>
       </div>
@@ -370,15 +548,32 @@
     </div>
   </div>
 
+  <!-- Diagnostics overlay shared by audit, logs, notifications, and hints. -->
   <div class="data-quality-panel" id="dataQualityPanel" hidden>
     <div class="data-quality-card">
-      <button class="data-quality-close" id="dataQualityCloseButton" type="button">×</button>
-      <p class="data-quality-kicker">Editor audit</p>
-      <h2>Проверка данных</h2>
-      <p class="data-quality-summary" id="dataQualitySummary">Пока ошибок не найдено.</p>
+      <div class="data-quality-head">
+        <div class="data-quality-copy">
+          <p class="data-quality-kicker" id="dataQualityKicker">Information center</p>
+          <h2 id="dataQualityTitle">Diagnostics</h2>
+          <p class="data-quality-summary" id="dataQualitySummary">No obvious issues are visible yet.</p>
+        </div>
+        <button class="data-quality-close" id="dataQualityCloseButton" type="button">×</button>
+      </div>
+      <div class="data-quality-toolbar">
+        <div class="data-quality-tabs" id="dataQualityTabs">
+          <button class="data-quality-tab is-active" id="dataQualityAuditTab" type="button" data-info-view="audit">Audit</button>
+          <button class="data-quality-tab" id="dataQualityLogsTab" type="button" data-info-view="logs">Logs</button>
+          <button class="data-quality-tab" id="dataQualityNotificationsTab" type="button" data-info-view="notifications">Notifications</button>
+          <button class="data-quality-tab" id="dataQualityHintsTab" type="button" data-info-view="hints">Hints</button>
+        </div>
+        <button class="data-quality-hints-toggle" id="dataQualityHintsToggleButton" type="button">Hints: Off</button>
+      </div>
+      <div class="data-quality-filters" id="dataQualityFilters" hidden></div>
       <div class="data-quality-list" id="dataQualityList"></div>
     </div>
   </div>
+
+  <div class="runtime-toast-stack" id="runtimeToastStack" hidden></div>
 
   <div class="loading-editor-panel" id="loadingEditorPanel" hidden>
     <div class="loading-editor-card">
@@ -420,11 +615,20 @@
           <textarea class="loading-editor-textarea loading-editor-textarea-short" id="loadingEditorFailNoteInput"></textarea>
         </label>
         <label class="loading-editor-field">
-          <span class="loading-editor-label" id="loadingEditorFieldFlavorLabel">Flavor lines</span>
-          <div class="loading-editor-lines" id="loadingEditorFlavorLinesList"></div>
-          <button class="ghost-btn loading-editor-line-add" id="loadingEditorAddFlavorLineButton" type="button">+ Line</button>
-        </label>
-      </div>
+            <span class="loading-editor-label" id="loadingEditorFieldFlavorLabel">Flavor lines</span>
+            <div class="loading-editor-lines" id="loadingEditorFlavorLinesList"></div>
+            <button class="ghost-btn loading-editor-line-add" id="loadingEditorAddFlavorLineButton" type="button">+ Line</button>
+          </label>
+          <label class="loading-editor-field">
+            <span class="loading-editor-label" id="loadingEditorFieldArtworkLabel">Center image</span>
+            <div class="loading-editor-artwork-preview" id="loadingEditorArtworkPreview" hidden></div>
+            <div class="loading-editor-artwork-actions">
+              <button class="ghost-btn loading-editor-artwork-button" id="loadingEditorUploadImageButton" type="button">Upload image</button>
+              <button class="ghost-btn loading-editor-artwork-button" id="loadingEditorClearImageButton" type="button">Clear image</button>
+            </div>
+            <input id="loadingEditorImageInput" type="file" accept="image/*" hidden />
+          </label>
+        </div>
 
       <div class="loading-editor-actions">
         <button class="ghost-btn loading-editor-action" id="loadingEditorPreviewButton" type="button">Preview</button>
@@ -433,9 +637,6 @@
     </div>
   </div>
 
-  <script type="module" src="js/app.js?v=20260416-bootfix"></script>
+  <script type="module" src="js/app.js?v=20260424-section-visibility"></script>
 </body>
 </html>
-
-
-

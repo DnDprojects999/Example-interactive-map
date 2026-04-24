@@ -1,0 +1,68 @@
+:root {
+  --bg: #0f1117;
+  --map-fill: linear-gradient(180deg, rgba(50, 29, 38, .78), rgba(27, 22, 33, .8));
+  --map-border: rgba(255,60,60,.75);
+  --grid-line: rgba(255,255,255,.04);
+  --fog-a: rgba(255,255,255,.08);
+  --fog-b: rgba(255,255,255,.05);
+  --fog-c: rgba(255,255,255,.06);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.18);
+  --text: #f3f4f6;
+  --muted: #b8bfcc;
+  --topbar-h: 74px;
+  --sidebar-w: 82px;
+  --info-w: 370px;
+  --font-ui: "Inter", Arial, sans-serif;
+  --font-title: "Cinzel", serif;
+  --font-sidebar: "Trebuchet MS", "Inter", Arial, sans-serif;
+  --timeline-strip-h: 92px;
+  --timeline-axis-y: 70%;
+  --archive-accent: #d7b46a;
+  --archive-paper: rgba(218, 179, 101, .12);
+  --timeline-accent: #fca5a5;
+  --timeline-star: rgba(252, 165, 165, .82);
+
+  /* Site-theme foundation. Future presets can override these without rewriting
+     component selectors one by one. */
+  --theme-body-bg:
+    radial-gradient(circle at top left, rgba(91,33,182,.12), transparent 25%),
+    radial-gradient(circle at bottom right, rgba(220,38,38,.08), transparent 28%),
+    var(--bg);
+  --theme-loading-bg:
+    radial-gradient(circle at 50% 32%, rgba(232, 197, 118, .18), transparent 24%),
+    radial-gradient(circle at 18% 18%, rgba(125, 211, 252, .12), transparent 26%),
+    radial-gradient(circle at 76% 74%, rgba(244, 114, 182, .08), transparent 22%),
+    linear-gradient(180deg, #04060a, #0b0d14 54%, #130d08);
+  --theme-topbar-bg: linear-gradient(to bottom, rgba(5, 7, 12, .98), rgba(5, 7, 12, .93));
+  --theme-sidebar-bg: linear-gradient(to bottom, rgba(10, 12, 18, .88), rgba(10, 12, 18, .55));
+  --theme-popover-bg: linear-gradient(180deg, rgba(18,22,32,.98), rgba(12,15,24,.96));
+  --theme-shell-panel-bg:
+    linear-gradient(180deg, rgba(10,14,22,.97), rgba(9,11,18,.94)),
+    radial-gradient(circle at top left, rgba(232,197,118,.12), transparent 46%);
+  --theme-surface-bg: rgba(255,255,255,.04);
+  --theme-surface-strong-bg: rgba(255,255,255,.06);
+  --theme-surface-border: rgba(255,255,255,.12);
+  --theme-accent-glow: rgba(232,197,118,.12);
+  --theme-topbar-control-radius: 999px;
+  --theme-topbar-control-clip: none;
+}
+
+body[data-site-theme="serkonia"] {
+  --theme-body-bg:
+    radial-gradient(circle at top left, rgba(91,33,182,.12), transparent 25%),
+    radial-gradient(circle at bottom right, rgba(220,38,38,.08), transparent 28%),
+    var(--bg);
+}
+
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-ui);
+  color: var(--text);
+  background: var(--theme-body-bg);
+}
+button { font: inherit; }

@@ -1,10 +1,10 @@
-function getButtonLegendLabel(button) {
+function getButtonLegendLabel(button, fallback = "Button") {
   return (
     button.dataset.label
     || button.title
     || button.getAttribute("aria-label")
     || button.textContent?.trim()
-    || "Кнопка"
+    || fallback
   ).trim();
 }
 
@@ -22,9 +22,10 @@ function getButtonLegendColor(button) {
 function createLegendItem(button, options = {}) {
   const {
     editMode = false,
-    editLabel = "Редактировать",
+    labels,
     onEditGroup = null,
   } = options;
+
   const item = document.createElement("button");
   item.className = "sidebar-legend-item";
   item.type = "button";
@@ -40,12 +41,12 @@ function createLegendItem(button, options = {}) {
   textWrap.className = "sidebar-legend-copy";
 
   const title = document.createElement("strong");
-  title.textContent = getButtonLegendLabel(button);
+  title.textContent = getButtonLegendLabel(button, labels.button);
 
   const hint = document.createElement("em");
   hint.textContent = button.classList.contains("active")
-    ? "Сейчас включено"
-    : "Кликни по соответствующей кнопке слева";
+    ? labels.enabled
+    : labels.clickHint;
 
   textWrap.append(title, hint);
   item.append(badge, textWrap);
@@ -55,7 +56,7 @@ function createLegendItem(button, options = {}) {
     const editButton = document.createElement("button");
     editButton.className = "sidebar-legend-item-edit";
     editButton.type = "button";
-    editButton.textContent = editLabel;
+    editButton.textContent = labels.edit;
     editButton.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
@@ -75,11 +76,19 @@ export function createSidebarLegendController(options) {
     getUiText = null,
     onEditGroup = null,
   } = options;
+
   let observer = null;
 
   // A MutationObserver keeps the legend synchronized with sidebar buttons even
   // when another module re-renders them completely.
   const resolveUiText = (key, fallback) => (typeof getUiText === "function" ? getUiText(key) : fallback);
+  const getLabels = () => ({
+    button: resolveUiText("sidebar_legend_button", "Button"),
+    edit: resolveUiText("sidebar_legend_edit", "Edit"),
+    enabled: resolveUiText("sidebar_legend_enabled", "Currently enabled"),
+    clickHint: resolveUiText("sidebar_legend_click_hint", "Click the matching button on the left"),
+    empty: resolveUiText("sidebar_legend_empty", "Explanations for the side buttons will appear here when the current mode uses its own panel."),
+  });
 
   function close() {
     els.sidebarLegendPanel.hidden = true;
@@ -88,17 +97,16 @@ export function createSidebarLegendController(options) {
   }
 
   function render() {
-    els.sidebarLegendTitle.textContent = els.sidebarTitle.textContent?.trim() || resolveUiText("sidebar_layers", "Легенда");
+    const labels = getLabels();
+    els.sidebarLegendTitle.textContent = els.sidebarTitle.textContent?.trim() || resolveUiText("sidebar_layers", "Legend");
     els.sidebarLegendList.innerHTML = "";
-    if (els.sidebarLegendEditButton) {
-      els.sidebarLegendEditButton.hidden = !state.editMode;
-    }
+    if (els.sidebarLegendEditButton) els.sidebarLegendEditButton.hidden = !state.editMode;
 
     const buttons = [...els.toolButtonsContainer.querySelectorAll(".tool-btn")];
     if (!buttons.length) {
       const empty = document.createElement("div");
       empty.className = "sidebar-legend-empty";
-      empty.textContent = "Здесь появятся расшифровки боковых кнопок, когда выбран режим с собственной панелью.";
+      empty.textContent = labels.empty;
       els.sidebarLegendList.appendChild(empty);
       return;
     }
@@ -106,7 +114,7 @@ export function createSidebarLegendController(options) {
     buttons.forEach((button) => {
       els.sidebarLegendList.appendChild(createLegendItem(button, {
         editMode: state.editMode,
-        editLabel: resolveUiText("rename_world_button", "Редактировать"),
+        labels,
         onEditGroup,
       }));
     });

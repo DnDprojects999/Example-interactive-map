@@ -1,0 +1,1275 @@
+.topbar-tech-readout {
+  display: none;
+}
+
+body[data-site-theme="serkonia-command"] {
+  --topbar-h: 82px;
+  --command-accent-rgb: 103, 232, 255;
+  --command-accent-strong-rgb: 103, 232, 255;
+  --command-secondary-rgb: 127, 140, 255;
+  --command-success-rgb: 112, 247, 203;
+  --line: rgba(var(--command-accent-rgb), .18);
+  --line-strong: rgba(var(--command-accent-rgb), .34);
+  --text: #e4f7ff;
+  --muted: #8ca9bb;
+  --archive-accent: rgb(var(--command-accent-rgb));
+  --timeline-accent: rgb(var(--command-accent-rgb));
+  --timeline-star: rgba(var(--command-accent-rgb), .84);
+  --map-border: rgba(var(--command-accent-rgb), .72);
+  --grid-line: rgba(var(--command-accent-rgb), .06);
+  --fog-a: rgba(var(--command-accent-rgb), .045);
+  --fog-b: rgba(var(--command-accent-rgb), .028);
+  --fog-c: rgba(var(--command-secondary-rgb), .04);
+  --theme-tech-cyan: #67e8ff;
+  --theme-tech-cyan-soft: rgba(103, 232, 255, .16);
+  --theme-tech-blue: #7f8cff;
+  --theme-tech-panel:
+    linear-gradient(180deg, rgba(6, 17, 31, .96), rgba(4, 10, 19, .94));
+}
+
+body[data-site-theme="serkonia-command"].palette-green,
+body[data-site-theme="serkonia-command"].palette-verdant {
+  --command-accent-rgb: 114, 255, 181;
+  --command-accent-strong-rgb: 114, 255, 181;
+  --command-secondary-rgb: 118, 255, 224;
+  --command-success-rgb: 154, 255, 191;
+  --theme-tech-cyan: #72ffb5;
+  --theme-tech-cyan-soft: rgba(114, 255, 181, .16);
+  --theme-tech-blue: #76ffe0;
+}
+
+body[data-site-theme="serkonia-command"].palette-red,
+body[data-site-theme="serkonia-command"].palette-crimson {
+  --command-accent-rgb: 255, 120, 142;
+  --command-accent-strong-rgb: 255, 106, 125;
+  --command-secondary-rgb: 255, 162, 188;
+  --command-success-rgb: 255, 181, 193;
+  --theme-tech-cyan: #ff788e;
+  --theme-tech-cyan-soft: rgba(255, 120, 142, .16);
+  --theme-tech-blue: #ffa2bc;
+}
+
+body[data-site-theme="serkonia-command"] .topbar {
+  border-bottom-color: rgba(var(--command-accent-rgb), .26);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .08) inset,
+    0 16px 36px rgba(0, 0, 0, .5),
+    0 10px 24px rgba(1, 8, 18, .42);
+}
+
+body[data-site-theme="serkonia-command"] .topbar::before,
+body[data-site-theme="serkonia-command"] .topbar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+body[data-site-theme="serkonia-command"] .topbar::before {
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08) 0 1px, transparent 1px 80px),
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .06) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 14% 0%, rgba(var(--command-accent-rgb), .12), transparent 26%),
+    radial-gradient(circle at 82% 0%, rgba(var(--command-secondary-rgb), .14), transparent 24%);
+  opacity: .64;
+  mix-blend-mode: screen;
+}
+
+body[data-site-theme="serkonia-command"] .topbar::after {
+  top: auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(var(--command-accent-strong-rgb), .88), transparent);
+  box-shadow: 0 0 14px rgba(var(--command-accent-rgb), .36);
+}
+
+body[data-site-theme="serkonia-command"] .brand {
+  gap: 14px;
+}
+
+body[data-site-theme="serkonia-command"] .brand-main {
+  position: relative;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #f4fbff;
+  text-shadow: 0 0 18px rgba(var(--command-accent-rgb), .12);
+}
+
+body[data-site-theme="serkonia-command"] .brand-main::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(var(--command-accent-rgb), .5), transparent);
+}
+
+body[data-site-theme="serkonia-command"] .mode-word {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: rgba(224, 247, 255, .88);
+}
+
+body[data-site-theme="serkonia-command"] .topbar-tech-readout {
+  display: none;
+}
+
+body[data-site-theme="serkonia-command"] .brand-edit-button,
+body[data-site-theme="serkonia-command"] .language-toggle,
+body[data-site-theme="serkonia-command"] .section-visibility-toggle,
+body[data-site-theme="serkonia-command"] .mode-link,
+body[data-site-theme="serkonia-command"] .topbar-mini-trigger,
+body[data-site-theme="serkonia-command"] .map-view-btn,
+body[data-site-theme="serkonia-command"] .topbar .btn,
+body[data-site-theme="serkonia-command"] .topbar .ghost-btn,
+body[data-site-theme="serkonia-command"] .topbar-tool-btn,
+body[data-site-theme="serkonia-command"] .topbar-menu-action {
+  border-radius: 0;
+  clip-path: none;
+  border-color: rgba(var(--command-accent-rgb), .34);
+  background:
+    linear-gradient(180deg, rgba(9, 23, 38, .92), rgba(6, 13, 24, .94)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .12), transparent 44%);
+  color: #eefcff;
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 0 16px rgba(var(--command-accent-rgb), .08);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+body[data-site-theme="serkonia-command"] .brand-edit-button:hover,
+body[data-site-theme="serkonia-command"] .language-toggle:hover,
+body[data-site-theme="serkonia-command"] .language-toggle[aria-expanded="true"],
+body[data-site-theme="serkonia-command"] .section-visibility-toggle:hover,
+body[data-site-theme="serkonia-command"] .section-visibility-toggle[aria-expanded="true"],
+body[data-site-theme="serkonia-command"] .mode-link:hover,
+body[data-site-theme="serkonia-command"] .mode-link.active,
+body[data-site-theme="serkonia-command"] .topbar-mini-trigger:hover,
+body[data-site-theme="serkonia-command"] .topbar-mini-trigger[aria-expanded="true"],
+body[data-site-theme="serkonia-command"] .topbar .btn:hover,
+body[data-site-theme="serkonia-command"] .topbar .ghost-btn:hover,
+body[data-site-theme="serkonia-command"] .topbar-menu-action:hover,
+body[data-site-theme="serkonia-command"] .topbar-tool-btn:hover {
+  border-color: rgba(var(--command-accent-rgb), .6);
+  background:
+    linear-gradient(180deg, rgba(13, 31, 48, .96), rgba(7, 16, 29, .96)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .18), transparent 48%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .1) inset,
+    0 0 20px rgba(var(--command-accent-rgb), .16);
+}
+
+body[data-site-theme="serkonia-command"] .mode-link-secondary {
+  color: #dcfbff;
+}
+
+body[data-site-theme="serkonia-command"] .map-view-switcher {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .26);
+  background:
+    linear-gradient(180deg, rgba(7, 16, 28, .94), rgba(6, 11, 20, .92));
+  box-shadow: 0 0 0 1px rgba(var(--command-accent-rgb), .05) inset;
+}
+
+body[data-site-theme="serkonia-command"] .map-view-btn {
+  color: rgba(189, 219, 232, .76);
+}
+
+body[data-site-theme="serkonia-command"] .map-view-btn.active {
+  color: #f1fcff;
+  background:
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .18), rgba(var(--command-accent-rgb), .08));
+  box-shadow: 0 0 14px rgba(var(--command-accent-rgb), .14);
+}
+
+body[data-site-theme="serkonia-command"] .language-popover,
+body[data-site-theme="serkonia-command"] .section-visibility-panel,
+body[data-site-theme="serkonia-command"] .audio-popover,
+body[data-site-theme="serkonia-command"] .topbar-mini-popover,
+body[data-site-theme="serkonia-command"] .homebrew-language-popover {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .26);
+  background:
+    linear-gradient(180deg, rgba(7, 17, 30, .98), rgba(4, 10, 20, .96)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08), transparent 48%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .08) inset,
+    0 20px 44px rgba(0,0,0,.38),
+    0 0 28px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .language-option,
+body[data-site-theme="serkonia-command"] .language-option-visibility,
+body[data-site-theme="serkonia-command"] .section-visibility-option,
+body[data-site-theme="serkonia-command"] .language-editor-actions .ghost-btn {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .22);
+  background:
+    linear-gradient(180deg, rgba(9, 20, 34, .96), rgba(6, 12, 22, .94)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08), transparent 44%);
+}
+
+body[data-site-theme="serkonia-command"] .language-option.active,
+body[data-site-theme="serkonia-command"] .language-option:hover,
+body[data-site-theme="serkonia-command"] .language-option-visibility:hover,
+body[data-site-theme="serkonia-command"] .section-visibility-option:hover,
+body[data-site-theme="serkonia-command"] .language-editor-actions .ghost-btn:hover {
+  border-color: rgba(var(--command-accent-rgb), .48);
+  background:
+    linear-gradient(180deg, rgba(12, 27, 44, .96), rgba(8, 16, 28, .95)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .14), transparent 48%);
+}
+
+body[data-site-theme="serkonia-command"] .section-visibility-heading {
+  color: rgba(var(--command-accent-rgb), .95);
+}
+
+body[data-site-theme="serkonia-command"] .section-visibility-switch {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .24);
+  background: rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .section-visibility-switch::after {
+  border-radius: 0;
+  background: rgba(210, 244, 255, .72);
+}
+
+body[data-site-theme="serkonia-command"] .section-visibility-option input:checked + .section-visibility-switch {
+  border-color: rgba(var(--command-accent-rgb), .62);
+  background: rgba(var(--command-accent-rgb), .2);
+}
+
+body[data-site-theme="serkonia-command"] .section-visibility-option input:checked + .section-visibility-switch::after {
+  background: rgb(var(--command-accent-rgb));
+  box-shadow: 0 0 12px rgba(var(--command-accent-rgb), .38);
+}
+
+body[data-site-theme="serkonia-command"] .workspace::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .03) 0 1px, transparent 1px 120px),
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .03) 0 1px, transparent 1px 120px);
+  opacity: .26;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console {
+  position: absolute;
+  left: 34px;
+  top: 30px;
+  bottom: 28px;
+  z-index: 38;
+  width: clamp(230px, 17vw, 310px);
+  pointer-events: none;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-frame {
+  position: relative;
+  height: 100%;
+  padding: 30px 0 0 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-frame::before,
+body[data-site-theme="serkonia-command"] .tech-console-frame::after {
+  content: none;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-kicker {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 12px 24px;
+  color: rgba(var(--command-accent-rgb), .78);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-lines {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  height: calc(100% - 26px);
+  overflow: hidden;
+  padding: 8px 8px 0 24px;
+  font-family: ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  mask-image: linear-gradient(180deg, transparent 0, black 10%, black 90%, transparent 100%);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  min-height: 17px;
+  color: rgba(206, 233, 244, .72);
+  font-size: 12px;
+  line-height: 1.35;
+  text-shadow: 0 0 10px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-prefix {
+  color: rgba(var(--command-accent-rgb), .64);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-content {
+  overflow-wrap: anywhere;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line-preview {
+  color: rgba(151, 223, 255, .78);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line-action {
+  color: rgba(244, 248, 255, .84);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line-success {
+  color: rgba(var(--command-success-rgb), .84);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line-warning {
+  color: rgba(255, 191, 128, .82);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line.typing .tech-console-content::after {
+  content: "_";
+  margin-left: 2px;
+  color: rgba(var(--command-accent-rgb), .9);
+  animation: tech-console-caret 1s steps(1) infinite;
+}
+
+@keyframes tech-console-caret {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+body[data-site-theme="serkonia-command"] .topbar,
+body[data-site-theme="serkonia-command"] .map-view-switcher,
+body[data-site-theme="serkonia-command"] .language-popover,
+body[data-site-theme="serkonia-command"] .audio-popover,
+body[data-site-theme="serkonia-command"] .topbar-mini-popover,
+body[data-site-theme="serkonia-command"] .homebrew-language-popover,
+body[data-site-theme="serkonia-command"] .sidebar,
+body[data-site-theme="serkonia-command"] .sidebar-legend-panel,
+body[data-site-theme="serkonia-command"] .player-popout,
+body[data-site-theme="serkonia-command"] .global-search-inner,
+body[data-site-theme="serkonia-command"] .data-quality-card,
+body[data-site-theme="serkonia-command"] .archive-shell,
+body[data-site-theme="serkonia-command"] .homebrew-article-card,
+body[data-site-theme="serkonia-command"] .homebrew-empty,
+body[data-site-theme="serkonia-command"] .editor-actions,
+body[data-site-theme="serkonia-command"] .map-scale-indicator,
+body[data-site-theme="serkonia-command"] .homebrew-chip,
+body[data-site-theme="serkonia-command"] .homebrew-chip-icon,
+body[data-site-theme="serkonia-command"] .homebrew-action-btn,
+body[data-site-theme="serkonia-command"] .homebrew-language-option,
+body[data-site-theme="serkonia-command"] .player-popout-action,
+body[data-site-theme="serkonia-command"] .data-quality-tab,
+body[data-site-theme="serkonia-command"] .data-quality-hints-toggle,
+body[data-site-theme="serkonia-command"] .data-quality-filters button {
+  border-color: rgba(var(--command-accent-rgb), .24);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .05) inset,
+    0 0 20px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .topbar::before {
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08) 0 1px, transparent 1px 80px),
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .06) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 14% 0%, rgba(var(--command-accent-rgb), .12), transparent 26%),
+    radial-gradient(circle at 82% 0%, rgba(var(--command-secondary-rgb), .14), transparent 24%);
+}
+
+body[data-site-theme="serkonia-command"] .topbar::after,
+body[data-site-theme="serkonia-command"] .brand-main::after {
+  background: linear-gradient(90deg, transparent, rgba(var(--command-accent-strong-rgb), .88), transparent);
+  box-shadow: 0 0 14px rgba(var(--command-accent-rgb), .36);
+}
+
+body[data-site-theme="serkonia-command"] .brand-main {
+  text-shadow: 0 0 18px rgba(var(--command-accent-rgb), .12);
+}
+
+body[data-site-theme="serkonia-command"] .brand-edit-button,
+body[data-site-theme="serkonia-command"] .language-toggle,
+body[data-site-theme="serkonia-command"] .mode-link,
+body[data-site-theme="serkonia-command"] .topbar-mini-trigger,
+body[data-site-theme="serkonia-command"] .map-view-btn,
+body[data-site-theme="serkonia-command"] .topbar .btn,
+body[data-site-theme="serkonia-command"] .topbar .ghost-btn,
+body[data-site-theme="serkonia-command"] .topbar-tool-btn,
+body[data-site-theme="serkonia-command"] .topbar-menu-action,
+body[data-site-theme="serkonia-command"] .sidebar-search-button,
+body[data-site-theme="serkonia-command"] .sidebar-utility-button,
+body[data-site-theme="serkonia-command"] .sidebar-legend-toggle,
+body[data-site-theme="serkonia-command"] .editor-shell-toggle,
+body[data-site-theme="serkonia-command"] .editor-theme-button,
+body[data-site-theme="serkonia-command"] .editor-action-btn,
+body[data-site-theme="serkonia-command"] .editor-theme-option,
+body[data-site-theme="serkonia-command"] .palette-option,
+body[data-site-theme="serkonia-command"] .language-option,
+body[data-site-theme="serkonia-command"] .language-option-visibility,
+body[data-site-theme="serkonia-command"] .language-editor-actions .ghost-btn {
+  border-color: rgba(var(--command-accent-rgb), .3);
+  background:
+    linear-gradient(180deg, rgba(9, 23, 38, .92), rgba(6, 13, 24, .94)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .12), transparent 44%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 0 16px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .brand-edit-button:hover,
+body[data-site-theme="serkonia-command"] .language-toggle:hover,
+body[data-site-theme="serkonia-command"] .language-toggle[aria-expanded="true"],
+body[data-site-theme="serkonia-command"] .mode-link:hover,
+body[data-site-theme="serkonia-command"] .mode-link.active,
+body[data-site-theme="serkonia-command"] .topbar-mini-trigger:hover,
+body[data-site-theme="serkonia-command"] .topbar-mini-trigger[aria-expanded="true"],
+body[data-site-theme="serkonia-command"] .topbar .btn:hover,
+body[data-site-theme="serkonia-command"] .topbar .ghost-btn:hover,
+body[data-site-theme="serkonia-command"] .topbar-menu-action:hover,
+body[data-site-theme="serkonia-command"] .topbar-tool-btn:hover,
+body[data-site-theme="serkonia-command"] .sidebar-search-button:hover,
+body[data-site-theme="serkonia-command"] .sidebar-utility-button:hover,
+body[data-site-theme="serkonia-command"] .sidebar-utility-button.active,
+body[data-site-theme="serkonia-command"] .sidebar-legend-toggle:hover,
+body[data-site-theme="serkonia-command"] .sidebar-legend-toggle.active,
+body[data-site-theme="serkonia-command"] .editor-shell-toggle:hover,
+body[data-site-theme="serkonia-command"] .editor-theme-button:hover,
+body[data-site-theme="serkonia-command"] .editor-theme-button[aria-expanded="true"],
+body[data-site-theme="serkonia-command"] .editor-action-btn:hover,
+body[data-site-theme="serkonia-command"] .editor-theme-option:hover,
+body[data-site-theme="serkonia-command"] .editor-theme-option.active,
+body[data-site-theme="serkonia-command"] .palette-option:hover,
+body[data-site-theme="serkonia-command"] .palette-option.active,
+body[data-site-theme="serkonia-command"] .language-option:hover,
+body[data-site-theme="serkonia-command"] .language-option.active,
+body[data-site-theme="serkonia-command"] .language-option-visibility:hover,
+body[data-site-theme="serkonia-command"] .language-editor-actions .ghost-btn:hover {
+  border-color: rgba(var(--command-accent-rgb), .56);
+  background:
+    linear-gradient(180deg, rgba(13, 31, 48, .96), rgba(7, 16, 29, .96)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .18), transparent 48%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .1) inset,
+    0 0 20px rgba(var(--command-accent-rgb), .16);
+}
+
+body[data-site-theme="serkonia-command"] .map-view-btn.active,
+body[data-site-theme="serkonia-command"] .editor-action-btn.active {
+  border-color: rgba(var(--command-accent-rgb), .6);
+  background:
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .22), rgba(var(--command-accent-rgb), .08));
+  box-shadow: 0 0 18px rgba(var(--command-accent-rgb), .14);
+}
+
+body[data-site-theme="serkonia-command"] .workspace::before {
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .03) 0 1px, transparent 1px 120px),
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .03) 0 1px, transparent 1px 120px);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-kicker,
+body[data-site-theme="serkonia-command"] .tech-console-prefix,
+body[data-site-theme="serkonia-command"] .homebrew-article-meta,
+body[data-site-theme="serkonia-command"] .homebrew-editor-label,
+body[data-site-theme="serkonia-command"] .sidebar-legend-kicker,
+body[data-site-theme="serkonia-command"] .player-popout-kicker,
+body[data-site-theme="serkonia-command"] .audio-popover-kicker,
+body[data-site-theme="serkonia-command"] .audio-editor-kicker,
+body[data-site-theme="serkonia-command"] .editor-shell-kicker,
+body[data-site-theme="serkonia-command"] .editor-theme-popover-title {
+  color: rgba(var(--command-accent-rgb), .82);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line-preview {
+  color: rgba(var(--command-accent-rgb), .82);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line-success {
+  color: rgba(var(--command-success-rgb), .88);
+}
+
+body[data-site-theme="serkonia-command"] .tech-console-line.typing .tech-console-content::after {
+  color: rgba(var(--command-accent-rgb), .9);
+}
+
+body[data-site-theme="serkonia-command"] .palette-popover {
+  z-index: 340;
+  isolation: isolate;
+  border-color: rgba(var(--command-accent-rgb), .28);
+  background: rgb(6 12 22);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .08) inset,
+    0 20px 44px rgba(0,0,0,.54),
+    0 0 28px rgba(var(--command-accent-rgb), .08);
+  backdrop-filter: none;
+}
+
+body[data-site-theme="serkonia-command"] .palette-popover::before,
+body[data-site-theme="serkonia-command"] .palette-popover::after {
+  content: none;
+}
+
+body[data-site-theme="serkonia-command"] .palette-option,
+body[data-site-theme="serkonia-command"].palette-green .palette-option,
+body[data-site-theme="serkonia-command"].palette-red .palette-option {
+  background: rgb(10 18 30);
+  background-image: none;
+}
+
+body[data-site-theme="serkonia-command"] .palette-option:hover,
+body[data-site-theme="serkonia-command"] .palette-option.active,
+body[data-site-theme="serkonia-command"].palette-green .palette-option:hover,
+body[data-site-theme="serkonia-command"].palette-green .palette-option.active,
+body[data-site-theme="serkonia-command"].palette-red .palette-option:hover,
+body[data-site-theme="serkonia-command"].palette-red .palette-option.active {
+  background: rgb(14 24 40);
+  background-image: none;
+}
+
+body[data-site-theme="serkonia-command"] .tech-console,
+body[data-site-theme="serkonia-command"] .tech-console-frame,
+body[data-site-theme="serkonia-command"] .tech-console-lines,
+body[data-site-theme="serkonia-command"] .tech-console-line,
+body[data-site-theme="serkonia-command"] .tech-console-kicker {
+  z-index: 20;
+}
+
+body[data-site-theme="serkonia-command"].palette-green .topbar,
+body[data-site-theme="serkonia-command"].palette-red .topbar,
+body[data-site-theme="serkonia-command"].palette-green .sidebar,
+body[data-site-theme="serkonia-command"].palette-red .sidebar,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-legend-panel,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-legend-panel,
+body[data-site-theme="serkonia-command"].palette-green .player-popout,
+body[data-site-theme="serkonia-command"].palette-red .player-popout,
+body[data-site-theme="serkonia-command"].palette-green .global-search-inner,
+body[data-site-theme="serkonia-command"].palette-red .global-search-inner,
+body[data-site-theme="serkonia-command"].palette-green .data-quality-card,
+body[data-site-theme="serkonia-command"].palette-red .data-quality-card,
+body[data-site-theme="serkonia-command"].palette-green .archive-shell,
+body[data-site-theme="serkonia-command"].palette-red .archive-shell,
+body[data-site-theme="serkonia-command"].palette-green .homebrew-article-card,
+body[data-site-theme="serkonia-command"].palette-red .homebrew-article-card,
+body[data-site-theme="serkonia-command"].palette-green .homebrew-empty,
+body[data-site-theme="serkonia-command"].palette-red .homebrew-empty,
+body[data-site-theme="serkonia-command"].palette-green .editor-actions,
+body[data-site-theme="serkonia-command"].palette-red .editor-actions,
+body[data-site-theme="serkonia-command"].palette-green .map-scale-indicator,
+body[data-site-theme="serkonia-command"].palette-red .map-scale-indicator {
+  border-color: rgba(var(--command-accent-rgb), .24);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 0 20px rgba(var(--command-accent-rgb), .1);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .topbar::before,
+body[data-site-theme="serkonia-command"].palette-red .topbar::before {
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08) 0 1px, transparent 1px 80px),
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .06) 0 1px, transparent 1px 100%),
+    radial-gradient(circle at 14% 0%, rgba(var(--command-accent-rgb), .12), transparent 26%),
+    radial-gradient(circle at 82% 0%, rgba(var(--command-secondary-rgb), .14), transparent 24%);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .topbar::after,
+body[data-site-theme="serkonia-command"].palette-red .topbar::after,
+body[data-site-theme="serkonia-command"].palette-green .brand-main::after,
+body[data-site-theme="serkonia-command"].palette-red .brand-main::after {
+  background: linear-gradient(90deg, transparent, rgba(var(--command-accent-strong-rgb), .88), transparent);
+  box-shadow: 0 0 14px rgba(var(--command-accent-rgb), .36);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .brand-main,
+body[data-site-theme="serkonia-command"].palette-red .brand-main {
+  text-shadow: 0 0 18px rgba(var(--command-accent-rgb), .14);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .brand-edit-button,
+body[data-site-theme="serkonia-command"].palette-green .language-toggle,
+body[data-site-theme="serkonia-command"].palette-green .mode-link,
+body[data-site-theme="serkonia-command"].palette-green .topbar-mini-trigger,
+body[data-site-theme="serkonia-command"].palette-green .map-view-btn,
+body[data-site-theme="serkonia-command"].palette-green .topbar .btn,
+body[data-site-theme="serkonia-command"].palette-green .topbar .ghost-btn,
+body[data-site-theme="serkonia-command"].palette-green .topbar-tool-btn,
+body[data-site-theme="serkonia-command"].palette-green .topbar-menu-action,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-search-button,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-utility-button,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-legend-toggle,
+body[data-site-theme="serkonia-command"].palette-green .editor-shell-toggle,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-button,
+body[data-site-theme="serkonia-command"].palette-green .editor-action-btn,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-option,
+body[data-site-theme="serkonia-command"].palette-green .palette-option,
+body[data-site-theme="serkonia-command"].palette-green .language-option,
+body[data-site-theme="serkonia-command"].palette-green .language-option-visibility,
+body[data-site-theme="serkonia-command"].palette-green .language-editor-actions .ghost-btn,
+body[data-site-theme="serkonia-command"].palette-red .brand-edit-button,
+body[data-site-theme="serkonia-command"].palette-red .language-toggle,
+body[data-site-theme="serkonia-command"].palette-red .mode-link,
+body[data-site-theme="serkonia-command"].palette-red .topbar-mini-trigger,
+body[data-site-theme="serkonia-command"].palette-red .map-view-btn,
+body[data-site-theme="serkonia-command"].palette-red .topbar .btn,
+body[data-site-theme="serkonia-command"].palette-red .topbar .ghost-btn,
+body[data-site-theme="serkonia-command"].palette-red .topbar-tool-btn,
+body[data-site-theme="serkonia-command"].palette-red .topbar-menu-action,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-search-button,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-utility-button,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-legend-toggle,
+body[data-site-theme="serkonia-command"].palette-red .editor-shell-toggle,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-button,
+body[data-site-theme="serkonia-command"].palette-red .editor-action-btn,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-option,
+body[data-site-theme="serkonia-command"].palette-red .palette-option,
+body[data-site-theme="serkonia-command"].palette-red .language-option,
+body[data-site-theme="serkonia-command"].palette-red .language-option-visibility,
+body[data-site-theme="serkonia-command"].palette-red .language-editor-actions .ghost-btn {
+  border-color: rgba(var(--command-accent-rgb), .3);
+  background:
+    linear-gradient(180deg, rgba(9, 23, 38, .92), rgba(6, 13, 24, .94)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .12), transparent 44%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 0 16px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .brand-edit-button:hover,
+body[data-site-theme="serkonia-command"].palette-green .language-toggle:hover,
+body[data-site-theme="serkonia-command"].palette-green .language-toggle[aria-expanded="true"],
+body[data-site-theme="serkonia-command"].palette-green .mode-link:hover,
+body[data-site-theme="serkonia-command"].palette-green .mode-link.active,
+body[data-site-theme="serkonia-command"].palette-green .topbar-mini-trigger:hover,
+body[data-site-theme="serkonia-command"].palette-green .topbar-mini-trigger[aria-expanded="true"],
+body[data-site-theme="serkonia-command"].palette-green .topbar .btn:hover,
+body[data-site-theme="serkonia-command"].palette-green .topbar .ghost-btn:hover,
+body[data-site-theme="serkonia-command"].palette-green .topbar-menu-action:hover,
+body[data-site-theme="serkonia-command"].palette-green .topbar-tool-btn:hover,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-search-button:hover,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-utility-button:hover,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-utility-button.active,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-legend-toggle:hover,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-legend-toggle.active,
+body[data-site-theme="serkonia-command"].palette-green .editor-shell-toggle:hover,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-button:hover,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-button[aria-expanded="true"],
+body[data-site-theme="serkonia-command"].palette-green .editor-action-btn:hover,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-option:hover,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-option.active,
+body[data-site-theme="serkonia-command"].palette-green .palette-option:hover,
+body[data-site-theme="serkonia-command"].palette-green .palette-option.active,
+body[data-site-theme="serkonia-command"].palette-green .language-option:hover,
+body[data-site-theme="serkonia-command"].palette-green .language-option.active,
+body[data-site-theme="serkonia-command"].palette-green .language-option-visibility:hover,
+body[data-site-theme="serkonia-command"].palette-green .language-editor-actions .ghost-btn:hover,
+body[data-site-theme="serkonia-command"].palette-red .brand-edit-button:hover,
+body[data-site-theme="serkonia-command"].palette-red .language-toggle:hover,
+body[data-site-theme="serkonia-command"].palette-red .language-toggle[aria-expanded="true"],
+body[data-site-theme="serkonia-command"].palette-red .mode-link:hover,
+body[data-site-theme="serkonia-command"].palette-red .mode-link.active,
+body[data-site-theme="serkonia-command"].palette-red .topbar-mini-trigger:hover,
+body[data-site-theme="serkonia-command"].palette-red .topbar-mini-trigger[aria-expanded="true"],
+body[data-site-theme="serkonia-command"].palette-red .topbar .btn:hover,
+body[data-site-theme="serkonia-command"].palette-red .topbar .ghost-btn:hover,
+body[data-site-theme="serkonia-command"].palette-red .topbar-menu-action:hover,
+body[data-site-theme="serkonia-command"].palette-red .topbar-tool-btn:hover,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-search-button:hover,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-utility-button:hover,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-utility-button.active,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-legend-toggle:hover,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-legend-toggle.active,
+body[data-site-theme="serkonia-command"].palette-red .editor-shell-toggle:hover,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-button:hover,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-button[aria-expanded="true"],
+body[data-site-theme="serkonia-command"].palette-red .editor-action-btn:hover,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-option:hover,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-option.active,
+body[data-site-theme="serkonia-command"].palette-red .palette-option:hover,
+body[data-site-theme="serkonia-command"].palette-red .palette-option.active,
+body[data-site-theme="serkonia-command"].palette-red .language-option:hover,
+body[data-site-theme="serkonia-command"].palette-red .language-option.active,
+body[data-site-theme="serkonia-command"].palette-red .language-option-visibility:hover,
+body[data-site-theme="serkonia-command"].palette-red .language-editor-actions .ghost-btn:hover {
+  border-color: rgba(var(--command-accent-rgb), .56);
+  background:
+    linear-gradient(180deg, rgba(13, 31, 48, .96), rgba(7, 16, 29, .96)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .18), transparent 48%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .1) inset,
+    0 0 20px rgba(var(--command-accent-rgb), .16);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .tech-console-kicker,
+body[data-site-theme="serkonia-command"].palette-green .tech-console-prefix,
+body[data-site-theme="serkonia-command"].palette-green .tech-console-line-preview,
+body[data-site-theme="serkonia-command"].palette-green .editor-shell-kicker,
+body[data-site-theme="serkonia-command"].palette-green .editor-theme-popover-title,
+body[data-site-theme="serkonia-command"].palette-green .sidebar-legend-kicker,
+body[data-site-theme="serkonia-command"].palette-green .player-popout-kicker,
+body[data-site-theme="serkonia-command"].palette-green .audio-popover-kicker,
+body[data-site-theme="serkonia-command"].palette-green .audio-editor-kicker,
+body[data-site-theme="serkonia-command"].palette-red .tech-console-kicker,
+body[data-site-theme="serkonia-command"].palette-red .tech-console-prefix,
+body[data-site-theme="serkonia-command"].palette-red .tech-console-line-preview,
+body[data-site-theme="serkonia-command"].palette-red .editor-shell-kicker,
+body[data-site-theme="serkonia-command"].palette-red .editor-theme-popover-title,
+body[data-site-theme="serkonia-command"].palette-red .sidebar-legend-kicker,
+body[data-site-theme="serkonia-command"].palette-red .player-popout-kicker,
+body[data-site-theme="serkonia-command"].palette-red .audio-popover-kicker,
+body[data-site-theme="serkonia-command"].palette-red .audio-editor-kicker {
+  color: rgba(var(--command-accent-rgb), .82);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .tech-console-line-success,
+body[data-site-theme="serkonia-command"].palette-red .tech-console-line-success {
+  color: rgba(var(--command-success-rgb), .88);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .tech-console-line.typing .tech-console-content::after,
+body[data-site-theme="serkonia-command"].palette-red .tech-console-line.typing .tech-console-content::after {
+  color: rgba(var(--command-accent-rgb), .9);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .timeline-shell,
+body[data-site-theme="serkonia-command"].palette-red .timeline-shell,
+body[data-site-theme="serkonia-command"].palette-green .archive-shell,
+body[data-site-theme="serkonia-command"].palette-red .archive-shell,
+body[data-site-theme="serkonia-command"].palette-green .global-search-inner,
+body[data-site-theme="serkonia-command"].palette-red .global-search-inner,
+body[data-site-theme="serkonia-command"].palette-green .data-quality-card,
+body[data-site-theme="serkonia-command"].palette-red .data-quality-card {
+  border-color: rgba(var(--command-accent-rgb), .26);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .timeline-shell::before,
+body[data-site-theme="serkonia-command"].palette-red .timeline-shell::before {
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,.7) 0 1px, transparent 1.5px),
+    radial-gradient(circle, var(--timeline-star) 0 1px, transparent 1.4px);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .archive-group-title,
+body[data-site-theme="serkonia-command"].palette-red .archive-group-title,
+body[data-site-theme="serkonia-command"].palette-green .timeline-title,
+body[data-site-theme="serkonia-command"].palette-red .timeline-title {
+  text-shadow: 0 0 26px color-mix(in srgb, var(--timeline-accent) 22%, transparent), 0 12px 32px rgba(0,0,0,.42);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .data-quality-kicker,
+body[data-site-theme="serkonia-command"].palette-green .data-quality-summary,
+body[data-site-theme="serkonia-command"].palette-green .global-search-label,
+body[data-site-theme="serkonia-command"].palette-red .data-quality-kicker,
+body[data-site-theme="serkonia-command"].palette-red .data-quality-summary,
+body[data-site-theme="serkonia-command"].palette-red .global-search-label {
+  color: rgba(var(--command-accent-rgb), .82);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .data-quality-close,
+body[data-site-theme="serkonia-command"].palette-green .global-search-close,
+body[data-site-theme="serkonia-command"].palette-red .data-quality-close,
+body[data-site-theme="serkonia-command"].palette-red .global-search-close {
+  border-color: rgba(var(--command-accent-rgb), .22);
+  background: rgba(var(--command-accent-rgb), .06);
+}
+
+body[data-site-theme="serkonia-command"].palette-green .data-quality-close:hover,
+body[data-site-theme="serkonia-command"].palette-green .global-search-close:hover,
+body[data-site-theme="serkonia-command"].palette-red .data-quality-close:hover,
+body[data-site-theme="serkonia-command"].palette-red .global-search-close:hover {
+  border-color: rgba(var(--command-accent-rgb), .48);
+  background: rgba(var(--command-accent-rgb), .14);
+}
+
+/* Palette-aware Command Deck surfaces */
+body[data-site-theme="serkonia-command"] .sidebar {
+  background:
+    linear-gradient(180deg, rgba(5, 13, 24, .96), rgba(4, 10, 18, .9)),
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .06), transparent 28%);
+  border-right-color: rgba(var(--command-accent-rgb), .24);
+  box-shadow: 0 0 0 1px rgba(var(--command-accent-rgb), .04) inset;
+}
+
+body[data-site-theme="serkonia-command"] .sidebar-search-button,
+body[data-site-theme="serkonia-command"] .sidebar-utility-button,
+body[data-site-theme="serkonia-command"] .sidebar-legend-toggle,
+body[data-site-theme="serkonia-command"] .panel-handle,
+body[data-site-theme="serkonia-command"] .player-popout-close,
+body[data-site-theme="serkonia-command"] .player-popout-secondary,
+body[data-site-theme="serkonia-command"] .player-popout-action,
+body[data-site-theme="serkonia-command"] .homebrew-search-wrap,
+body[data-site-theme="serkonia-command"] .homebrew-chip,
+body[data-site-theme="serkonia-command"] .homebrew-chip-icon,
+body[data-site-theme="serkonia-command"] .homebrew-action-btn,
+body[data-site-theme="serkonia-command"] .homebrew-language-option,
+body[data-site-theme="serkonia-command"] .homebrew-editor-input,
+body[data-site-theme="serkonia-command"] .homebrew-editor-select,
+body[data-site-theme="serkonia-command"] .homebrew-editor-textarea,
+body[data-site-theme="serkonia-command"] .editor-shell-toggle,
+body[data-site-theme="serkonia-command"] .editor-theme-button,
+body[data-site-theme="serkonia-command"] .editor-action-btn,
+body[data-site-theme="serkonia-command"] .editor-theme-option,
+body[data-site-theme="serkonia-command"] .draw-layer-panel-inline,
+body[data-site-theme="serkonia-command"] .data-quality-tab,
+body[data-site-theme="serkonia-command"] .data-quality-hints-toggle,
+body[data-site-theme="serkonia-command"] .data-quality-filters button,
+body[data-site-theme="serkonia-command"] .global-search-close,
+body[data-site-theme="serkonia-command"] .data-quality-close,
+body[data-site-theme="serkonia-command"] .heroes-home,
+body[data-site-theme="serkonia-command"] .heroes-editor-tools .topbar-tool-btn,
+body[data-site-theme="serkonia-command"] .hero-card-open-edit,
+body[data-site-theme="serkonia-command"] .archive-card-expand-edit,
+body[data-site-theme="serkonia-command"] .archive-collapse {
+  border-radius: 0;
+  clip-path: none;
+}
+
+body[data-site-theme="serkonia-command"] .sidebar-legend-panel,
+body[data-site-theme="serkonia-command"] .player-popout,
+body[data-site-theme="serkonia-command"] .global-search-inner,
+body[data-site-theme="serkonia-command"] .data-quality-card,
+body[data-site-theme="serkonia-command"] .archive-shell,
+body[data-site-theme="serkonia-command"] .homebrew-article-card,
+body[data-site-theme="serkonia-command"] .homebrew-empty,
+body[data-site-theme="serkonia-command"] .editor-actions {
+  border-radius: 0;
+  background:
+    linear-gradient(180deg, rgba(7, 17, 30, .97), rgba(4, 10, 20, .95)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .06), transparent 46%);
+}
+
+body[data-site-theme="serkonia-command"] .map-stage::before,
+body[data-site-theme="serkonia-command"] .info-panel::before,
+body[data-site-theme="serkonia-command"] .editor-actions::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  pointer-events: none;
+  border: 1px solid rgba(var(--command-accent-rgb), .1);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+}
+
+body[data-site-theme="serkonia-command"] .editor-actions {
+  background:
+    linear-gradient(180deg, rgba(5, 14, 26, .99), rgba(3, 9, 18, .98)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08), transparent 44%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 -18px 40px rgba(0,0,0,.3);
+}
+
+body[data-site-theme="serkonia-command"] .editor-shell-head {
+  border-bottom-color: rgba(var(--command-accent-rgb), .18);
+}
+
+body[data-site-theme="serkonia-command"] .draw-layer-panel-inline,
+body[data-site-theme="serkonia-command"] .map-scale-indicator,
+body[data-site-theme="serkonia-command"] .player-popout-action,
+body[data-site-theme="serkonia-command"] .data-quality-tab,
+body[data-site-theme="serkonia-command"] .data-quality-hints-toggle,
+body[data-site-theme="serkonia-command"] .data-quality-filters button,
+body[data-site-theme="serkonia-command"] .heroes-home,
+body[data-site-theme="serkonia-command"] .heroes-editor-tools .topbar-tool-btn,
+body[data-site-theme="serkonia-command"] .hero-card-open-edit,
+body[data-site-theme="serkonia-command"] .archive-card-expand-edit,
+body[data-site-theme="serkonia-command"] .archive-collapse,
+body[data-site-theme="serkonia-command"] .global-search-close,
+body[data-site-theme="serkonia-command"] .data-quality-close {
+  border-color: rgba(var(--command-accent-rgb), .24);
+  background:
+    linear-gradient(180deg, rgba(10, 24, 40, .96), rgba(6, 12, 22, .94)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .1), transparent 44%);
+  color: #effdff;
+  box-shadow: 0 0 0 1px rgba(var(--command-accent-rgb), .04) inset;
+}
+
+body[data-site-theme="serkonia-command"] .player-popout-action,
+body[data-site-theme="serkonia-command"] .draw-layer-panel-inline,
+body[data-site-theme="serkonia-command"] .data-quality-tab,
+body[data-site-theme="serkonia-command"] .data-quality-hints-toggle,
+body[data-site-theme="serkonia-command"] .data-quality-filters button,
+body[data-site-theme="serkonia-command"] .heroes-home,
+body[data-site-theme="serkonia-command"] .heroes-editor-tools .topbar-tool-btn,
+body[data-site-theme="serkonia-command"] .hero-card-open-edit,
+body[data-site-theme="serkonia-command"] .archive-card-expand-edit,
+body[data-site-theme="serkonia-command"] .archive-collapse,
+body[data-site-theme="serkonia-command"] .global-search-close,
+body[data-site-theme="serkonia-command"] .data-quality-close {
+  transition:
+    border-color .2s ease,
+    background .2s ease,
+    box-shadow .2s ease,
+    transform .2s ease;
+}
+
+body[data-site-theme="serkonia-command"] .draw-layer-panel-inline {
+  border-color: rgba(var(--command-accent-rgb), .22);
+  background:
+    linear-gradient(180deg, rgba(11, 21, 34, .98), rgba(7, 12, 22, .98)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .08), transparent 44%);
+}
+
+body[data-site-theme="serkonia-command"] .map-scale-indicator {
+  background: rgba(3, 12, 20, .84);
+  color: #dff9ff;
+  box-shadow: 0 0 16px rgba(var(--command-accent-rgb), .1);
+}
+
+body[data-site-theme="serkonia-command"] .homebrew-chip,
+body[data-site-theme="serkonia-command"] .homebrew-chip-icon,
+body[data-site-theme="serkonia-command"] .homebrew-action-btn,
+body[data-site-theme="serkonia-command"] .homebrew-language-option {
+  border-color: rgba(var(--command-accent-rgb), .22);
+  background: rgba(var(--command-accent-rgb), .05);
+}
+
+body[data-site-theme="serkonia-command"] .homebrew-chip:hover,
+body[data-site-theme="serkonia-command"] .homebrew-chip.active,
+body[data-site-theme="serkonia-command"] .homebrew-chip-icon:hover,
+body[data-site-theme="serkonia-command"] .homebrew-action-btn:hover,
+body[data-site-theme="serkonia-command"] .homebrew-language-option:hover,
+body[data-site-theme="serkonia-command"] .homebrew-language-option.active,
+body[data-site-theme="serkonia-command"] .player-popout-action:hover,
+body[data-site-theme="serkonia-command"] .data-quality-tab:hover,
+body[data-site-theme="serkonia-command"] .data-quality-tab.is-active,
+body[data-site-theme="serkonia-command"] .data-quality-hints-toggle:hover,
+body[data-site-theme="serkonia-command"] .data-quality-filters button:hover,
+body[data-site-theme="serkonia-command"] .data-quality-filters button.is-active,
+body[data-site-theme="serkonia-command"] .heroes-home:hover,
+body[data-site-theme="serkonia-command"] .hero-card-open-edit:hover,
+body[data-site-theme="serkonia-command"] .archive-card-expand-edit:hover,
+body[data-site-theme="serkonia-command"] .archive-collapse:hover,
+body[data-site-theme="serkonia-command"] .global-search-close:hover,
+body[data-site-theme="serkonia-command"] .data-quality-close:hover {
+  border-color: rgba(var(--command-accent-rgb), .48);
+  background:
+    linear-gradient(180deg, rgba(12, 28, 45, .98), rgba(8, 16, 28, .96)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .16), transparent 48%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .08) inset,
+    0 0 18px rgba(var(--command-accent-rgb), .12);
+}
+
+body[data-site-theme="serkonia-command"] .hover-hint-card {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .56);
+  background:
+    linear-gradient(135deg, #02070c, #05070d),
+    repeating-linear-gradient(90deg, rgba(var(--command-accent-rgb), .08) 0 1px, transparent 1px 14px);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .12),
+    0 18px 50px rgba(0, 0, 0, .48),
+    0 0 24px rgba(var(--command-accent-rgb), .18);
+}
+
+body[data-site-theme="serkonia-command"] .hover-hint-kicker,
+body[data-site-theme="serkonia-command"] .hover-hint-title {
+  color: rgb(var(--command-accent-rgb));
+}
+
+body[data-site-theme="serkonia-command"] .homebrew-article-title,
+body[data-site-theme="serkonia-command"] .archive-group-title,
+body[data-site-theme="serkonia-command"] .heroes-title {
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+body[data-site-theme="serkonia-command"] .heroes-page {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(var(--command-accent-rgb), .08), transparent 28%),
+    linear-gradient(180deg, rgba(3, 7, 14, .28), rgba(3, 7, 14, .12));
+}
+
+body[data-site-theme="serkonia-command"] .heroes-stars {
+  opacity: .26;
+  filter: hue-rotate(140deg) saturate(1.24);
+}
+
+body[data-site-theme="serkonia-command"] .global-search-label,
+body[data-site-theme="serkonia-command"] .data-quality-kicker,
+body[data-site-theme="serkonia-command"] .data-quality-summary,
+body[data-site-theme="serkonia-command"] .heroes-kicker,
+body[data-site-theme="serkonia-command"] .heroes-group-subtitle,
+body[data-site-theme="serkonia-command"] .heroes-intro {
+  color: rgba(var(--command-accent-rgb), .82);
+}
+
+body[data-site-theme="serkonia-command"] .marker {
+  width: 20px;
+  height: 18px;
+  border-radius: 0;
+  border: 1.5px solid rgba(232, 247, 255, .9);
+  clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+  background-clip: padding-box;
+  box-shadow: none;
+  filter: drop-shadow(0 0 10px rgba(var(--command-accent-rgb), .16));
+}
+
+body[data-site-theme="serkonia-command"] .sidebar-legend-badge {
+  border-radius: 0;
+  clip-path: polygon(25% 6.7%, 75% 6.7%, 100% 50%, 75% 93.3%, 25% 93.3%, 0 50%);
+  border-color: color-mix(in srgb, var(--legend-badge-color) 72%, rgba(var(--command-accent-rgb), .34));
+  background:
+    radial-gradient(circle at 50% 30%, rgba(255,255,255,.12), transparent 48%),
+    color-mix(in srgb, var(--legend-badge-color) 34%, rgba(var(--command-accent-rgb), .08));
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .05) inset,
+    0 0 14px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .event-card {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .34);
+  background:
+    linear-gradient(135deg, rgba(var(--command-accent-rgb), .13), transparent 34%),
+    linear-gradient(180deg, rgba(4, 13, 24, .88), rgba(2, 7, 14, .78)),
+    repeating-linear-gradient(0deg, rgba(var(--command-accent-rgb), .055) 0 1px, transparent 1px 14px);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .08) inset,
+    0 0 24px rgba(var(--command-accent-rgb), .1),
+    0 22px 48px rgba(0,0,0,.34);
+}
+
+body[data-site-theme="serkonia-command"] .event-card.current {
+  border-color: rgba(var(--command-accent-rgb), .72);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .16) inset,
+    0 0 34px rgba(var(--command-accent-rgb), .18),
+    0 26px 56px rgba(0,0,0,.42);
+}
+
+body[data-site-theme="serkonia-command"] .event-card::before {
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .78) 0 22px, transparent 22px calc(100% - 22px), rgba(var(--command-accent-rgb), .78) calc(100% - 22px)) top / 100% 1px no-repeat,
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .78) 0 22px, transparent 22px calc(100% - 22px), rgba(var(--command-accent-rgb), .78) calc(100% - 22px)) bottom / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .78) 0 22px, transparent 22px calc(100% - 22px), rgba(var(--command-accent-rgb), .78) calc(100% - 22px)) left / 1px 100% no-repeat,
+    linear-gradient(180deg, rgba(var(--command-accent-rgb), .78) 0 22px, transparent 22px calc(100% - 22px), rgba(var(--command-accent-rgb), .78) calc(100% - 22px)) right / 1px 100% no-repeat;
+  opacity: .58;
+}
+
+body[data-site-theme="serkonia-command"] .event-card::after {
+  content: "DOC//NODE";
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  color: rgba(var(--command-accent-rgb), .36);
+  font-family: var(--font-ui);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+body[data-site-theme="serkonia-command"] .event-year,
+body[data-site-theme="serkonia-command"] .event-title {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+
+body[data-site-theme="serkonia-command"] .event-year {
+  color: rgba(2, 7, 14, .88);
+  -webkit-text-stroke: 1px rgba(var(--command-accent-rgb), .82);
+  text-shadow:
+    0 0 8px rgba(var(--command-accent-rgb), .28),
+    1px 0 rgba(var(--command-accent-rgb), .68),
+    -1px 0 rgba(var(--command-accent-rgb), .68),
+    0 1px rgba(var(--command-accent-rgb), .68),
+    0 -1px rgba(var(--command-accent-rgb), .68);
+}
+
+body[data-site-theme="serkonia-command"] .event-title {
+  color: rgba(245, 253, 255, .96);
+  -webkit-text-stroke: 0 transparent;
+  text-shadow:
+    0 0 12px rgba(var(--command-accent-rgb), .2),
+    0 0 24px rgba(var(--command-accent-rgb), .08);
+}
+
+body[data-site-theme="serkonia-command"] .event-text {
+  color: rgba(214, 239, 248, .76);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  line-height: 1.58;
+}
+
+body[data-site-theme="serkonia-command"] .event-act-chip,
+body[data-site-theme="serkonia-command"] .event-timeline-date {
+  border-radius: 0;
+  font-family: var(--font-ui);
+  letter-spacing: .12em;
+}
+
+body[data-site-theme="serkonia-command"] .event-act-chip {
+  border-color: rgba(var(--command-accent-rgb), .34);
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .16), transparent 70%),
+    rgba(4, 13, 24, .72);
+  color: rgba(237, 252, 255, .9);
+}
+
+body[data-site-theme="serkonia-command"] .event-dot {
+  border-radius: 0;
+  transform: rotate(45deg);
+  border-color: rgba(var(--command-accent-rgb), .82);
+  background: rgba(3, 11, 20, .92);
+  box-shadow:
+    0 0 0 5px rgba(var(--command-accent-rgb), .12),
+    0 0 22px rgba(var(--command-accent-rgb), .38);
+}
+
+body[data-site-theme="serkonia-command"] .hero-card,
+body[data-site-theme="serkonia-command"] .hero-expanded {
+  border-radius: 0;
+  border-color: color-mix(in srgb, var(--hero-accent) 58%, rgba(var(--command-accent-rgb), .56));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--hero-accent) 16%, transparent), transparent 36%),
+    linear-gradient(180deg, rgba(4, 12, 22, .38), rgba(2, 6, 12, .18)),
+    repeating-linear-gradient(90deg, rgba(var(--command-accent-rgb), .045) 0 1px, transparent 1px 18px);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .1) inset,
+    0 0 26px color-mix(in srgb, var(--hero-accent) 20%, transparent),
+    0 18px 42px rgba(0,0,0,.34);
+}
+
+body[data-site-theme="serkonia-command"] .hero-card::before {
+  border-radius: 0;
+  inset: 12px;
+  border-color: color-mix(in srgb, var(--hero-accent) 38%, rgba(var(--command-accent-rgb), .22));
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--hero-accent) 42%, transparent) 0 24px, transparent 24px) top left / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent calc(100% - 24px), color-mix(in srgb, var(--hero-accent) 42%, transparent) calc(100% - 24px)) bottom right / 100% 1px no-repeat;
+  box-shadow: 0 0 20px rgba(var(--command-accent-rgb), .06) inset;
+}
+
+body[data-site-theme="serkonia-command"] .hero-card::after {
+  inset: auto -10% -28% -10%;
+  height: 44%;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--hero-accent) 46%, transparent), transparent 58%),
+    linear-gradient(90deg, transparent, rgba(var(--command-accent-rgb), .12), transparent);
+  opacity: .62;
+}
+
+body[data-site-theme="serkonia-command"] .hero-card:hover,
+body[data-site-theme="serkonia-command"] .hero-card.expanded {
+  border-color: color-mix(in srgb, var(--hero-accent) 82%, white);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .12) inset,
+    0 0 34px color-mix(in srgb, var(--hero-accent) 34%, transparent),
+    0 24px 56px rgba(0,0,0,.4);
+}
+
+body[data-site-theme="serkonia-command"] .hero-card-portrait,
+body[data-site-theme="serkonia-command"] .hero-expanded-portrait {
+  border-radius: 0;
+  border-color: color-mix(in srgb, var(--hero-accent) 48%, rgba(var(--command-accent-rgb), .34));
+  background:
+    radial-gradient(circle at 50% 26%, color-mix(in srgb, var(--hero-accent) 18%, transparent), transparent 38%),
+    linear-gradient(135deg, rgba(var(--command-accent-rgb), .08), rgba(0,0,0,.24)),
+    rgba(2, 8, 15, .48);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 0 24px color-mix(in srgb, var(--hero-accent) 16%, transparent);
+}
+
+body[data-site-theme="serkonia-command"] .hero-card-title,
+body[data-site-theme="serkonia-command"] .hero-expanded-title,
+body[data-site-theme="serkonia-command"] .heroes-group-title {
+  color: #f3fcff;
+  text-shadow:
+    0 0 18px rgba(var(--command-accent-rgb), .12),
+    0 0 24px color-mix(in srgb, var(--hero-accent, rgb(var(--command-accent-rgb))) 18%, transparent);
+}
+
+body[data-site-theme="serkonia-command"] .hero-card-role,
+body[data-site-theme="serkonia-command"] .hero-expanded-role,
+body[data-site-theme="serkonia-command"] .hero-player-label {
+  color: color-mix(in srgb, var(--hero-accent) 72%, rgb(var(--command-accent-rgb)));
+  text-shadow: 0 0 12px color-mix(in srgb, var(--hero-accent) 24%, transparent);
+}
+
+body[data-site-theme="serkonia-command"] .hero-player-chip,
+body[data-site-theme="serkonia-command"] .hero-link,
+body[data-site-theme="serkonia-command"] .hero-accent-reset,
+body[data-site-theme="serkonia-command"] .hero-collapse {
+  border-radius: 0;
+  border-color: color-mix(in srgb, var(--hero-accent) 42%, rgba(var(--command-accent-rgb), .28));
+  background:
+    linear-gradient(180deg, rgba(6, 18, 30, .78), rgba(3, 9, 17, .68)),
+    linear-gradient(90deg, color-mix(in srgb, var(--hero-accent) 12%, transparent), transparent 48%);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--hero-accent) 12%, transparent);
+}
+
+body[data-site-theme="serkonia-command"] .heroes-group {
+  padding: 20px 18px 28px;
+  border-left: 1px solid rgba(var(--command-accent-rgb), .22);
+  background:
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .045), transparent 22%),
+    linear-gradient(180deg, transparent, rgba(var(--command-accent-rgb), .025));
+  box-shadow: -18px 0 30px rgba(var(--command-accent-rgb), .035);
+}
+
+body[data-site-theme="serkonia-command"] .heroes-group-header {
+  border-bottom: 1px solid rgba(var(--command-accent-rgb), .18);
+  padding-bottom: 14px;
+}
+
+body[data-site-theme="serkonia-command"] .sidebar-legend-edit-button,
+body[data-site-theme="serkonia-command"] .sidebar-legend-item-edit {
+  border-radius: 0;
+  border-color: rgba(var(--command-accent-rgb), .3);
+  background:
+    linear-gradient(180deg, rgba(9, 23, 38, .92), rgba(6, 13, 24, .94)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .12), transparent 44%);
+  color: rgba(238, 252, 255, .94);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .06) inset,
+    0 0 16px rgba(var(--command-accent-rgb), .08);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+body[data-site-theme="serkonia-command"] .sidebar-legend-edit-button:hover,
+body[data-site-theme="serkonia-command"] .sidebar-legend-item-edit:hover {
+  border-color: rgba(var(--command-accent-rgb), .56);
+  background:
+    linear-gradient(180deg, rgba(13, 31, 48, .96), rgba(7, 16, 29, .96)),
+    linear-gradient(90deg, rgba(var(--command-accent-rgb), .18), transparent 48%);
+  box-shadow:
+    0 0 0 1px rgba(var(--command-accent-rgb), .1) inset,
+    0 0 20px rgba(var(--command-accent-rgb), .16);
+}
+
+@media (max-width: 980px) {
+  body[data-site-theme="serkonia-command"] .topbar-tech-readout {
+    display: none;
+  }
+
+  body[data-site-theme="serkonia-command"] .tech-console {
+    display: none !important;
+  }
+}

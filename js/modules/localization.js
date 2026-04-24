@@ -1,14 +1,14 @@
 export const DEFAULT_LANGUAGE = "ru";
 
 const LANGUAGE_LABELS = Object.freeze({
-  ru: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
+  ru: "Русский",
   en: "English",
   de: "Deutsch",
   fr: "Français",
   es: "Español",
   it: "Italiano",
   pl: "Polski",
-  uk: "\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430",
+  uk: "Українська",
 });
 
 function cloneValue(value) {
@@ -139,7 +139,8 @@ export function getLanguageLabel(worldData, code) {
 
 export function shouldShowLanguageSwitcher(worldData, editMode = false) {
   if (editMode) return true;
-  return getUserFacingLanguages(worldData).length > 1 || Boolean(worldData?.languagesEnabled && getUserFacingLanguages(worldData).length > 0);
+  return getUserFacingLanguages(worldData).length > 1
+    || Boolean(worldData?.languagesEnabled && getUserFacingLanguages(worldData).length > 0);
 }
 
 export function canUserOpenLanguageMenu(worldData) {

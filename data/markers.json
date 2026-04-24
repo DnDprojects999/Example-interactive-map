@@ -22,7 +22,7 @@
       "translations": {
         "en": {
           "name": "Capitals",
-          "short": "K"
+          "short": "A"
         }
       }
     },
@@ -79,7 +79,18 @@
         "Контроль: торговый совет",
         "Население: ~48 000",
         "Особенность: независимая гавань"
-      ]
+      ],
+      "translations": {
+        "en": {
+          "type": "Trade city",
+          "description": "A major coastal city through which most maritime trade of the northern shore passes.",
+          "facts": [
+            "Control: merchant council",
+            "Population: ~48,000",
+            "Feature: independent harbor"
+          ]
+        }
+      }
     },
     {
       "id": "thornwall",
@@ -93,7 +104,18 @@
         "Контроль: корона",
         "Население: ~76 000",
         "Особенность: дворец и цитадель"
-      ]
+      ],
+      "translations": {
+        "en": {
+          "type": "Royal capital",
+          "description": "A fortress capital around which the old frontier of Serkonia and its vassal lands were built.",
+          "facts": [
+            "Control: the crown",
+            "Population: ~76,000",
+            "Feature: palace and citadel"
+          ]
+        }
+      }
     },
     {
       "id": "ashen-vault",
@@ -107,7 +129,18 @@
         "Статус: опасная зона",
         "Известно: артефакты и тоннели",
         "Особенность: запечатанные залы"
-      ]
+      ],
+      "translations": {
+        "en": {
+          "type": "Ruins of an ancient complex",
+          "description": "A shattered underground complex tied to the age of schism. The place often appears in legends and expeditions.",
+          "facts": [
+            "Status: danger zone",
+            "Known for: artifacts and tunnels",
+            "Feature: sealed halls"
+          ]
+        }
+      }
     },
     {
       "id": "ember-accord",
@@ -121,7 +154,18 @@
         "Тип: политико-торговый союз",
         "Методы: договоры, давление, золото",
         "Особенность: сеть агентов"
-      ]
+      ],
+      "translations": {
+        "en": {
+          "type": "Faction influence",
+          "description": "An alliance of noble houses and hired captains that is gradually seizing trade routes and influence in the borderlands.",
+          "facts": [
+            "Type: political-mercantile alliance",
+            "Methods: treaties, pressure, gold",
+            "Feature: network of agents"
+          ]
+        }
+      }
     },
     {
       "id": "broken-banner-trail",
@@ -135,7 +179,18 @@
         "Уровень угрозы: средний",
         "Награда: неизвестна",
         "Особенность: легко расширяется в сюжет"
-      ]
+      ],
+      "translations": {
+        "en": {
+          "type": "Active story hook",
+          "description": "The trail of a missing squad leads toward a line of ancient towers. From this point an entire chain of adventures can unfold.",
+          "facts": [
+            "Threat level: moderate",
+            "Reward: unknown",
+            "Feature: easily expands into a full arc"
+          ]
+        }
+      }
     }
   ]
 }

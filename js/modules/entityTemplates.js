@@ -1,31 +1,147 @@
 const DEFAULT_HERO_ACCENT = "#b98a4b";
 
-// Template factories provide the starter content that appears when an editor
-// creates a new entity from the UI.
 function normalizeKind(kind) {
   const value = String(kind || "").trim().toLowerCase();
-  if (["faction", "fractions", "guild", "order"].includes(value)) return "faction";
-  if (["city", "state", "country", "region", "realm"].includes(value)) return "city";
-  if (["authority", "power", "council", "institution"].includes(value)) return "authority";
+  if (["faction", "fractions", "guild", "order", "cult", "фракция", "орден", "культ"].includes(value)) return "faction";
+  if (["city", "state", "country", "region", "realm", "город", "регион", "земли"].includes(value)) return "city";
+  if (["authority", "power", "council", "institution", "власть", "совет", "палата"].includes(value)) return "authority";
   return "general";
 }
 
+const ARCHIVE_GROUP_TEMPLATES = Object.freeze({
+  faction: {
+    ru: { title: "Фракции" },
+    en: { title: "Factions" },
+  },
+  city: {
+    ru: { title: "Города и регионы" },
+    en: { title: "Cities and Regions" },
+  },
+  authority: {
+    ru: { title: "Органы власти" },
+    en: { title: "Seats of Power" },
+  },
+  general: {
+    ru: { title: "Новая глава" },
+    en: { title: "New chapter" },
+  },
+});
+
+const ARCHIVE_ITEM_TEMPLATES = Object.freeze({
+  faction: {
+    ru: {
+      title: "Новая фракция",
+      imageLabel: "Герб, эмблема или символ фракции",
+      expandedImageLabel: "Большой баннер, сцена или портрет лидера",
+      symbolLabel: "Герб, логотип или символ фракции",
+      description: "Кто они, где держат влияние и чем известны на карте Серконии.",
+      fullDescription:
+        "Кто они такие.\nКакие у них цели и интересы.\nГде они действуют и кого поддерживают.\nЧем могут быть полезны или опасны для игроков.",
+    },
+    en: {
+      title: "New faction",
+      imageLabel: "Faction crest, emblem, or symbol",
+      expandedImageLabel: "A larger banner, scene, or portrait of a leader",
+      symbolLabel: "Faction crest, logo, or symbol",
+      description: "Who they are, where their influence reaches, and what they are known for across Serkonia.",
+      fullDescription:
+        "Who they are.\nWhat goals and interests drive them.\nWhere they operate and whom they support.\nWhy they might help or threaten the party.",
+    },
+  },
+  city: {
+    ru: {
+      title: "Новый город",
+      imageLabel: "Вид города или герб",
+      expandedImageLabel: "Большая иллюстрация места",
+      description: "Чем живёт этот город или регион и почему он важен для кампании.",
+      fullDescription:
+        "Краткая история места.\nЧто здесь правит и работает.\nЧем город славится.\nКакие проблемы или зацепки ждут игроков.",
+    },
+    en: {
+      title: "New city",
+      imageLabel: "City view or crest",
+      expandedImageLabel: "Large illustration of the location",
+      description: "What this city or region lives by and why it matters to the campaign.",
+      fullDescription:
+        "A short history of the place.\nWhat rules or thrives here.\nWhat the city is known for.\nWhich problems or hooks await the party.",
+    },
+  },
+  authority: {
+    ru: {
+      title: "Новый орган власти",
+      imageLabel: "Печать, символ или зал заседаний",
+      expandedImageLabel: "Большая сцена власти или символа",
+      description: "Кто принимает решения и как этот институт влияет на мир.",
+      fullDescription:
+        "Кто входит в этот орган.\nКак он принимает решения.\nКакие ресурсы и рычаги влияния у него есть.\nЧем он важен для текущей хроники.",
+    },
+    en: {
+      title: "New authority",
+      imageLabel: "Seal, symbol, or council hall",
+      expandedImageLabel: "A larger scene of power or symbol",
+      description: "Who makes the decisions here and how this institution shapes the world.",
+      fullDescription:
+        "Who belongs to this authority.\nHow it makes decisions.\nWhat resources and leverage it commands.\nWhy it matters to the current chronicle.",
+    },
+  },
+  general: {
+    ru: {
+      title: "Новая запись",
+      imageLabel: "Иллюстрация карточки",
+      expandedImageLabel: "Иллюстрация раскрытого вида",
+      description: "Коротко опиши, что это за запись и почему на неё стоит обратить внимание.",
+      fullDescription:
+        "Подробное описание записи.\nОсновные детали.\nСвязи с миром.\nЧто игрокам важно знать в первую очередь.",
+    },
+    en: {
+      title: "New record",
+      imageLabel: "Card illustration",
+      expandedImageLabel: "Expanded illustration",
+      description: "Briefly describe what this record is and why it matters.",
+      fullDescription:
+        "Detailed record description.\nCore details.\nConnections to the world.\nWhat players should notice first.",
+    },
+  },
+});
+
 export function inferArchiveTemplateKind(group) {
-  // If a group kind was not stored explicitly, we make a best-effort guess from
-  // its title so old projects still get the right archive template.
   const explicitKind = normalizeKind(group?.kind);
   if (explicitKind !== "general") return explicitKind;
 
-  const title = String(group?.title || "").toLowerCase();
-  if (title.includes("С„СЂР°Рє") || title.includes("РіРёР»СЊРґ") || title.includes("РѕСЂРґРµРЅ")) return "faction";
-  if (title.includes("СЃС‚СЂР°РЅ") || title.includes("РіРѕСЂРѕРґ") || title.includes("СЂРµРіРёРѕРЅ") || title.includes("Р·РµРјР»")) return "city";
-  if (title.includes("РІР»Р°СЃС‚") || title.includes("СЃРѕРІРµС‚") || title.includes("РїР°Р»Р°С‚") || title.includes("СЃРёРЅРѕРґ")) return "authority";
+  const title = String(group?.title || "").trim().toLowerCase();
+  if (
+    title.includes("фракц")
+    || title.includes("гильд")
+    || title.includes("орден")
+    || title.includes("культ")
+    || title.includes("faction")
+    || title.includes("guild")
+    || title.includes("order")
+    || title.includes("cult")
+  ) return "faction";
+
+  if (
+    title.includes("город")
+    || title.includes("регион")
+    || title.includes("земл")
+    || title.includes("city")
+    || title.includes("region")
+    || title.includes("realm")
+  ) return "city";
+
+  if (
+    title.includes("власт")
+    || title.includes("совет")
+    || title.includes("палат")
+    || title.includes("authority")
+    || title.includes("council")
+    || title.includes("institution")
+  ) return "authority";
+
   return "general";
 }
 
 export function createTimelineEventTemplate(previousEvent) {
-  // New timeline events inherit position/act context from the previous event so
-  // bulk timeline building requires fewer manual fixes.
   return {
     year: "NOW",
     title: "Новый поворот хроники",
@@ -39,6 +155,14 @@ export function createTimelineEventTemplate(previousEvent) {
     position: previousEvent?.position === "up" ? "down" : "up",
     sidebarShortcut: false,
     sidebarShortcutLabel: "",
+    translations: {
+      en: {
+        title: "New turn of the chronicle",
+        description: "What happened, who was involved, and why this event matters to the world right now.",
+        fullDescription: "Describe the event in full: its consequences, participants, and the threads it leaves for the campaign.",
+        imageText: "An illustration, map, portrait of the participants, or a scene from the event.",
+      },
+    },
   };
 }
 
@@ -60,102 +184,91 @@ export function createTimelineActTemplate(order = 0) {
 
 export function createArchiveGroupTemplate(kind = "general") {
   const normalizedKind = normalizeKind(kind);
-  const templates = {
-    faction: {
-      title: "Р¤СЂР°РєС†РёРё",
-    },
-    city: {
-      title: "Р“РѕСЂРѕРґР° Рё СЂРµРіРёРѕРЅС‹",
-    },
-    authority: {
-      title: "РћСЂРіР°РЅС‹ РІР»Р°СЃС‚Рё",
-    },
-    general: {
-      title: "РќРѕРІР°СЏ РіР»Р°РІР°",
-    },
-  };
+  const template = ARCHIVE_GROUP_TEMPLATES[normalizedKind] || ARCHIVE_GROUP_TEMPLATES.general;
 
   return {
     id: "",
     kind: normalizedKind,
-    title: templates[normalizedKind].title,
+    title: template.ru.title,
     items: [],
+    translations: {
+      en: {
+        title: template.en.title,
+      },
+    },
   };
 }
 
 export function createArchiveItemTemplate(kind = "general", sortOrder = 0) {
   const normalizedKind = normalizeKind(kind);
-  const templates = {
-    faction: {
-      title: "РќРѕРІР°СЏ С„СЂР°РєС†РёСЏ",
-      imageLabel: "Р“РµСЂР± РёР»Рё СЃРёРјРІРѕР» С„СЂР°РєС†РёРё",
-      expandedImageLabel: "Р‘РѕР»СЊС€РѕР№ Р±Р°РЅРЅРµСЂ РёР»Рё РїРѕСЂС‚СЂРµС‚ Р»РёРґРµСЂР°",
-      description: "РљС‚Рѕ РѕРЅРё, РіРґРµ РґРµСЂР¶Р°С‚ РІР»РёСЏРЅРёРµ Рё С‡РµРј РёР·РІРµСЃС‚РЅС‹ РЅР° РєР°СЂС‚Рµ РЎРµСЂРєРѕРЅРёРё.",
-      fullDescription: "РљС‚Рѕ РѕРЅРё С‚Р°РєРёРµ.\nР¦РµР»Рё Рё РёРЅС‚РµСЂРµСЃС‹.\nРЎ РєРµРј РґСЂСѓР¶Р°С‚ РёР»Рё РІСЂР°Р¶РґСѓСЋС‚.\nР§РµРј РјРѕРіСѓС‚ Р±С‹С‚СЊ РїРѕР»РµР·РЅС‹ РёР»Рё РѕРїР°СЃРЅС‹ РґР»СЏ РёРіСЂРѕРєРѕРІ.",
-    },
-    city: {
-      title: "РќРѕРІС‹Р№ РіРѕСЂРѕРґ",
-      imageLabel: "Р’РёРґ РіРѕСЂРѕРґР° РёР»Рё РіРµСЂР±",
-      expandedImageLabel: "Р‘РѕР»СЊС€Р°СЏ РёР»Р»СЋСЃС‚СЂР°С†РёСЏ РјРµСЃС‚Р°",
-      description: "Р§РµРј Р¶РёРІС‘С‚ СЌС‚РѕС‚ РіРѕСЂРѕРґ РёР»Рё СЂРµРіРёРѕРЅ Рё РїРѕС‡РµРјСѓ РѕРЅ РІР°Р¶РµРЅ РґР»СЏ РєР°РјРїР°РЅРёРё.",
-      fullDescription: "РљСЂР°С‚РєР°СЏ РёСЃС‚РѕСЂРёСЏ РјРµСЃС‚Р°.\nРљС‚Рѕ Р·РґРµСЃСЊ РїСЂР°РІРёС‚.\nР§РµРј РіРѕСЂРѕРґ СЃР»Р°РІРёС‚СЃСЏ.\nРљР°РєРёРµ РїСЂРѕР±Р»РµРјС‹ РёР»Рё Р·Р°С†РµРїРєРё Р¶РґСѓС‚ РёРіСЂРѕРєРѕРІ.",
-    },
-    authority: {
-      title: "РќРѕРІС‹Р№ РѕСЂРіР°РЅ РІР»Р°СЃС‚Рё",
-      imageLabel: "РџРµС‡Р°С‚СЊ, СЃРёРјРІРѕР» РёР»Рё Р·Р°Р» Р·Р°СЃРµРґР°РЅРёР№",
-      expandedImageLabel: "Р‘РѕР»СЊС€Р°СЏ СЃС†РµРЅР° РІР»Р°СЃС‚Рё РёР»Рё СЃРёРјРІРѕР»Р°",
-      description: "РљС‚Рѕ РїСЂРёРЅРёРјР°РµС‚ СЂРµС€РµРЅРёСЏ Рё РєР°Рє СЌС‚РѕС‚ РёРЅСЃС‚РёС‚СѓС‚ РІР»РёСЏРµС‚ РЅР° РјРёСЂ.",
-      fullDescription: "РљС‚Рѕ РІС…РѕРґРёС‚ РІ СЌС‚РѕС‚ РѕСЂРіР°РЅ.\nРљР°Рє РѕРЅ РїСЂРёРЅРёРјР°РµС‚ СЂРµС€РµРЅРёСЏ.\nРљР°РєРёРµ СЂРµСЃСѓСЂСЃС‹ Рё СЂС‹С‡Р°РіРё РІР»РёСЏРЅРёСЏ Сѓ РЅРµРіРѕ РµСЃС‚СЊ.\nР§РµРј РѕРЅ РІР°Р¶РµРЅ РґР»СЏ С‚РµРєСѓС‰РµР№ С…СЂРѕРЅРёРєРё.",
-    },
-    general: {
-      title: "РќРѕРІР°СЏ Р·Р°РїРёСЃСЊ",
-      imageLabel: "РР»Р»СЋСЃС‚СЂР°С†РёСЏ РєР°СЂС‚РѕС‡РєРё",
-      expandedImageLabel: "РР»Р»СЋСЃС‚СЂР°С†РёСЏ СЂР°СЃРєСЂС‹С‚РѕРіРѕ РІРёРґР°",
-      description: "РљРѕСЂРѕС‚РєРѕ РѕРїРёС€Рё, С‡С‚Рѕ СЌС‚Рѕ Р·Р° Р·Р°РїРёСЃСЊ Рё РїРѕС‡РµРјСѓ РЅР° РЅРµС‘ СЃС‚РѕРёС‚ РѕР±СЂР°С‚РёС‚СЊ РІРЅРёРјР°РЅРёРµ.",
-      fullDescription: "РџРѕРґСЂРѕР±РЅРѕРµ РѕРїРёСЃР°РЅРёРµ Р·Р°РїРёСЃРё.\nРћСЃРЅРѕРІРЅС‹Рµ РґРµС‚Р°Р»Рё.\nРЎРІСЏР·Рё СЃ РјРёСЂРѕРј.\nР§С‚Рѕ РёРіСЂРѕРєР°Рј РІР°Р¶РЅРѕ Р·РЅР°С‚СЊ РІ РїРµСЂРІСѓСЋ РѕС‡РµСЂРµРґСЊ.",
-    },
-  };
+  const template = ARCHIVE_ITEM_TEMPLATES[normalizedKind] || ARCHIVE_ITEM_TEMPLATES.general;
 
   return {
     id: "",
-    title: templates[normalizedKind].title,
-    imageLabel: templates[normalizedKind].imageLabel,
-    expandedImageLabel: templates[normalizedKind].expandedImageLabel,
-    description: templates[normalizedKind].description,
-    fullDescription: templates[normalizedKind].fullDescription,
+    title: template.ru.title,
+    imageLabel: template.ru.imageLabel,
+    expandedImageLabel: template.ru.expandedImageLabel,
+    symbolLabel: template.ru.symbolLabel || "",
+    description: template.ru.description,
+    fullDescription: template.ru.fullDescription,
     sortOrder,
+    translations: {
+      en: {
+        title: template.en.title,
+        imageLabel: template.en.imageLabel,
+        expandedImageLabel: template.en.expandedImageLabel,
+        symbolLabel: template.en.symbolLabel || "",
+        description: template.en.description,
+        fullDescription: template.en.fullDescription,
+      },
+    },
   };
 }
 
 export function createHeroGroupTemplate() {
   return {
     id: "",
-    title: "РќРѕРІР°СЏ РїР°СЂС‚РёСЏ",
-    subtitle: "РљС‚Рѕ РІС…РѕРґРёС‚ РІ СЌС‚Сѓ РіСЂСѓРїРїСѓ, С‡РµРј РѕРЅР° СЃРІСЏР·Р°РЅР° Рё РєР°РєСѓСЋ СЂРѕР»СЊ РёРіСЂР°РµС‚ РІ С…СЂРѕРЅРёРєРµ РЎРµСЂРєРѕРЅРёРё.",
+    title: "Новая партия",
+    subtitle: "Опиши, кто входит в эту группу, чем она связана и какую роль играет в хронике Серконии.",
     items: [],
+    translations: {
+      en: {
+        title: "New party",
+        subtitle: "Describe who belongs to this group, what binds them together, and what role they play in Serkonia's chronicle.",
+      },
+    },
   };
 }
 
 export function createHeroCardTemplate(sortOrder = 0) {
   return {
     id: "",
-    title: "РќРѕРІС‹Р№ РіРµСЂРѕР№",
-    role: "Р РѕР»СЊ РІ С…СЂРѕРЅРёРєРµ",
-    imageLabel: "Р”РѕР±Р°РІСЊ РїРѕСЂС‚СЂРµС‚ РіРµСЂРѕСЏ",
+    title: "Новый герой",
+    role: "Роль в хронике",
+    imageLabel: "Добавь портрет героя",
     imageUrl: "",
     accentColor: DEFAULT_HERO_ACCENT,
     accentColorOverride: "",
-    description: "РљС‚Рѕ СЌС‚Рѕ, С‡РµРј РѕРЅ Р·Р°РїРѕРјРЅРёР»СЃСЏ РѕС‚СЂСЏРґСѓ Рё РїРѕС‡РµРјСѓ РЅР° РЅРµРіРѕ СЃС‚РѕРёС‚ СЃРјРѕС‚СЂРµС‚СЊ РІ РїРµСЂРІСѓСЋ РѕС‡РµСЂРµРґСЊ.",
-    fullDescription: "РџСЂРѕРёСЃС…РѕР¶РґРµРЅРёРµ Рё С…Р°СЂР°РєС‚РµСЂ.\nР¦РµР»Рё Рё РІРЅСѓС‚СЂРµРЅРЅРёРµ РєРѕРЅС„Р»РёРєС‚С‹.\nРЎРІСЏР·Рё СЃ РѕС‚СЂСЏРґРѕРј, С„СЂР°РєС†РёСЏРјРё Рё РјРёСЂРѕРј.\nР’Р°Р¶РЅС‹Рµ СЃС†РµРЅС‹, С‚Р°Р№РЅС‹ Рё Р·Р°С†РµРїРєРё РЅР° Р±СѓРґСѓС‰РµРµ.",
+    description: "Кто это, чем он запомнился отряду и почему на него стоит смотреть в первую очередь.",
+    fullDescription: "Происхождение и характер.\nЦели и внутренние конфликты.\nСвязи с отрядом, фракциями и миром.\nВажные сцены, тайны и зацепки на будущее.",
     sortOrder,
     links: [],
+    translations: {
+      en: {
+        title: "New hero",
+        role: "Role in the chronicle",
+        imageLabel: "Add a hero portrait",
+        description: "Who this is, what made them memorable to the party, and why they deserve attention first.",
+        fullDescription: "Origin and personality.\nGoals and inner conflicts.\nConnections to the party, factions, and the world.\nImportant scenes, secrets, and hooks for the future.",
+      },
+    },
   };
 }
 
 export function createHomebrewCategoryTemplate(sortOrder = 0) {
   return {
     id: "",
-    title: `\u041a\u0430\u0442\u0435\u0433\u043e\u0440\u0438\u044f ${sortOrder + 1}`,
+    title: `Категория ${sortOrder + 1}`,
     description: "",
     sortOrder,
     translations: {
@@ -171,9 +284,10 @@ export function createHomebrewArticleTemplate(sortOrder = 0, type = "change") {
   return {
     id: "",
     type,
-    title: "\u041d\u043e\u0432\u0430\u044f \u0441\u0442\u0430\u0442\u044c\u044f",
-    summary: "\u041a\u043e\u0440\u043e\u0442\u043a\u043e \u043e\u043f\u0438\u0448\u0438, \u0447\u0442\u043e \u0438\u043c\u0435\u043d\u043d\u043e \u043c\u0435\u043d\u044f\u0435\u0442\u0441\u044f, \u0434\u043e\u0431\u0430\u0432\u043b\u044f\u0435\u0442\u0441\u044f \u0438\u043b\u0438 \u0443\u0442\u043e\u0447\u043d\u044f\u0435\u0442\u0441\u044f.",
-    content: "\u0417\u0434\u0435\u0441\u044c \u043c\u043e\u0436\u043d\u043e \u043f\u043e\u0434\u0440\u043e\u0431\u043d\u043e \u0440\u0430\u0441\u043f\u0438\u0441\u0430\u0442\u044c \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u0435, \u043d\u043e\u0432\u043e\u0435 \u043f\u0440\u0430\u0432\u0438\u043b\u043e \u0438\u043b\u0438 \u0434\u043e\u043c\u0430\u0448\u043d\u0438\u0439 \u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b.",
+    title: "Новая статья",
+    summary: "Коротко опиши, что именно меняется, добавляется или уточняется.",
+    content: "Здесь можно подробно расписать изменение, новое правило или домашний материал.",
+    imageUrl: "",
     sourceUrl: "",
     categoryIds: [],
     sortOrder,

@@ -9,6 +9,7 @@ import {
   shouldShowLanguageSwitcher,
 } from "../localization.js";
 import { getUiText } from "../uiLocale.js";
+import { createLanguagePopoverController } from "./languagePopoverController.js";
 
 export function createLanguageSwitcherController({
   els,
@@ -18,47 +19,7 @@ export function createLanguageSwitcherController({
   persistWorldInfo,
   removeLanguageLayer,
 }) {
-  // The main language switcher is shared by players and editors, so the
-  // controller decides visibility, labels, and edit-only tools in one place.
-  function setOpen(isOpen) {
-    if (isOpen) {
-      els.languagePopover.removeAttribute("hidden");
-      position();
-      window.requestAnimationFrame(position);
-    } else {
-      els.languagePopover.setAttribute("hidden", "");
-    }
-    els.languageToggleButton.setAttribute("aria-expanded", String(isOpen));
-  }
-
-  function isOpen() {
-    return !els.languagePopover.hasAttribute("hidden");
-  }
-
-  function close() {
-    setOpen(false);
-  }
-
-  function position() {
-    // The popover is positioned in viewport coordinates so it stays attached to
-    // the toggle even when the page layout changes.
-    if (els.languagePopover.hasAttribute("hidden")) return;
-
-    const rect = els.languageToggleButton.getBoundingClientRect();
-    const viewportPadding = 12;
-    const popoverWidth = Math.max(220, els.languagePopover.offsetWidth || 220);
-    const centeredLeft = rect.left + (rect.width / 2) - (popoverWidth / 2);
-    const clampedLeft = Math.min(
-      Math.max(centeredLeft, viewportPadding),
-      Math.max(viewportPadding, window.innerWidth - popoverWidth - viewportPadding),
-    );
-
-    els.languagePopover.style.position = "fixed";
-    els.languagePopover.style.top = `${rect.bottom + 10}px`;
-    els.languagePopover.style.left = `${clampedLeft}px`;
-    els.languagePopover.style.right = "auto";
-    els.languagePopover.style.transform = "none";
-  }
+  const popoverController = createLanguagePopoverController({ els });
 
   function render() {
     // Editors see every configured language. Players only see languages that
@@ -89,7 +50,7 @@ export function createLanguageSwitcherController({
     }
 
     if (!visible) {
-      close();
+      popoverController.close();
       return;
     }
 
@@ -129,8 +90,8 @@ export function createLanguageSwitcherController({
     els.addLanguageButton.textContent = getUiText(state, "add_language");
     els.deleteLanguageButton.textContent = getUiText(state, "delete_language");
 
-    if (isOpen()) {
-      window.requestAnimationFrame(position);
+    if (popoverController.isOpen()) {
+      window.requestAnimationFrame(() => popoverController.position());
     }
   }
 
@@ -146,7 +107,7 @@ export function createLanguageSwitcherController({
       if (els.languageSwitcher.hidden) return;
       event.preventDefault();
       event.stopPropagation();
-      setOpen(!isOpen());
+      popoverController.setOpen(!popoverController.isOpen());
     });
 
     els.languagePopover.addEventListener("pointerdown", (event) => {
@@ -183,7 +144,7 @@ export function createLanguageSwitcherController({
       if (!button) return;
       state.currentLanguage = resolveLanguage(state.worldData, button.dataset.languageCode);
       persistCurrentLanguage(state.currentLanguage);
-      close();
+      popoverController.close();
       syncLocalizedUi();
     });
 
@@ -212,20 +173,20 @@ export function createLanguageSwitcherController({
 
     document.addEventListener("click", (event) => {
       if (!els.languageSwitcher.contains(event.target)) {
-        close();
+        popoverController.close();
       }
     });
 
-    window.addEventListener("resize", position);
-    window.addEventListener("scroll", position, true);
+    window.addEventListener("resize", () => popoverController.position());
+    window.addEventListener("scroll", () => popoverController.position(), true);
   }
 
   return {
     render,
     setup,
-    close,
-    position,
-    isOpen,
-    setOpen,
+    close: () => popoverController.close(),
+    position: () => popoverController.position(),
+    isOpen: () => popoverController.isOpen(),
+    setOpen: (isOpen) => popoverController.setOpen(isOpen),
   };
 }

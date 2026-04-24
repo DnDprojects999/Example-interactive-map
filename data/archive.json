@@ -3,102 +3,213 @@
     {
       "id": "factions",
       "title": "Фракции",
+      "translations": {
+        "en": {
+          "title": "Factions"
+        }
+      },
       "items": [
         {
           "id": "ember-order",
           "title": "Орден Янтарного Пламени",
           "imageLabel": "Герб ордена",
           "description": "Контролирует торговые пути на востоке материка.",
-          "fullDescription": "Орден Янтарного Пламени объединяет старые ремесленные дома и боевые гильдии. Их влияние держится на цепочке укреплённых караванных узлов и строгом кодексе вассалов. В последние годы орден активно расширяет присутствие в южных портах, что приводит к конфликтам с местными союзами городов."
+          "fullDescription": "Орден Янтарного Пламени объединяет старые ремесленные дома и боевые гильдии. Их влияние держится на цепочке укреплённых караванных узлов и строгом кодексе вассалов. В последние годы орден активно расширяет присутствие в южных портах, что приводит к конфликтам с местными союзами городов.",
+          "translations": {
+            "en": {
+              "title": "Order of the Amber Flame",
+              "imageLabel": "Order crest",
+              "description": "Controls the trade routes in the east of the continent.",
+              "fullDescription": "The Order of the Amber Flame unites old craft houses and martial guilds. Its influence rests on a chain of fortified caravan hubs and a strict vassal code. In recent years the order has expanded aggressively into the southern ports, causing friction with local city leagues."
+            }
+          }
         },
         {
           "id": "ivory-court",
           "title": "Слоновая Курия",
           "imageLabel": "Символ курии",
           "description": "Дипломатический блок прибрежных доминионов.",
-          "fullDescription": "Слоновая Курия формально выступает посредником между царствами, но на деле продвигает интересы собственных князей. Они известны сетью информаторов и системой клятв, которая связывает множество мелких домов в единую политическую машину."
+          "fullDescription": "Слоновая Курия формально выступает посредником между царствами, но на деле продвигает интересы собственных князей. Они известны сетью информаторов и системой клятв, которая связывает множество мелких домов в единую политическую машину.",
+          "translations": {
+            "en": {
+              "title": "Ivory Curia",
+              "imageLabel": "Curia symbol",
+              "description": "A diplomatic bloc of the coastal dominions.",
+              "fullDescription": "The Ivory Curia officially presents itself as a mediator between kingdoms, but in truth it advances the interests of its own princes. It is known for a web of informants and an oath system that binds many minor houses into one political machine."
+            }
+          }
         },
         {
           "id": "night-synod",
           "title": "Ночной Синод",
           "imageLabel": "Печать синода",
           "description": "Теневая коалиция учёных и магистров.",
-          "fullDescription": "Ночной Синод собирает запрещённые архивы, контролирует ряд академий и финансирует экспедиции в руины древних цивилизаций. Официально синод не вмешивается в войны, но его эксперты регулярно меняют ход кампаний через советы и технологии."
+          "fullDescription": "Ночной Синод собирает запрещённые архивы, контролирует ряд академий и финансирует экспедиции в руины древних цивилизаций. Официально синод не вмешивается в войны, но его эксперты регулярно меняют ход кампаний через советы и технологии.",
+          "translations": {
+            "en": {
+              "title": "Night Synod",
+              "imageLabel": "Synod seal",
+              "description": "A shadow coalition of scholars and magisters.",
+              "fullDescription": "The Night Synod gathers forbidden archives, controls several academies, and finances expeditions into the ruins of ancient civilizations. Officially it stays out of wars, yet its experts constantly alter the course of campaigns through counsel and technology."
+            }
+          }
         },
         {
           "id": "north-banner",
           "title": "Северное Знамя",
           "imageLabel": "Штандарт союза",
           "description": "Военный союз пограничных регионов.",
-          "fullDescription": "Северное Знамя возникло как ответ на непрерывные набеги с ледяных плато. Сейчас это дисциплинированный союз маршальств, где решения принимают на военном совете. Они удерживают стратегические перевалы и диктуют условия сухопутной логистики."
+          "fullDescription": "Северное Знамя возникло как ответ на непрерывные набеги с ледяных плато. Сейчас это дисциплинированный союз маршальств, где решения принимают на военном совете. Они удерживают стратегические перевалы и диктуют условия сухопутной логистики.",
+          "translations": {
+            "en": {
+              "title": "Northern Banner",
+              "imageLabel": "Alliance standard",
+              "description": "A military alliance of frontier regions.",
+              "fullDescription": "The Northern Banner arose as a response to constant raids from the icy plateaus. It is now a disciplined alliance of marchlands ruled through a war council. They hold strategic passes and dictate the terms of overland logistics."
+            }
+          }
         },
         {
           "id": "azure-exchange",
           "title": "Лазурная Контора",
           "imageLabel": "Торговая эмблема",
           "description": "Гильдейская конфедерация банков и перевозчиков.",
-          "fullDescription": "Лазурная Контора держит в руках морское страхование, кредитные дома и большую часть дальних перевозок. Её устав нейтрален, но доступ к финансированию часто превращается в инструмент давления на правителей и советы городов."
+          "fullDescription": "Лазурная Контора держит в руках морское страхование, кредитные дома и большую часть дальних перевозок. Её устав нейтрален, но доступ к финансированию часто превращается в инструмент давления на правителей и советы городов.",
+          "translations": {
+            "en": {
+              "title": "Azure Exchange",
+              "imageLabel": "Trade emblem",
+              "description": "A guild confederation of banks and transport houses.",
+              "fullDescription": "The Azure Exchange controls marine insurance, credit houses, and most long-range shipping. Its charter claims neutrality, yet access to its capital often becomes a tool used to pressure rulers and city councils."
+            }
+          }
         }
       ]
     },
     {
       "id": "states",
       "title": "Страны",
+      "translations": {
+        "en": {
+          "title": "Realms"
+        }
+      },
       "items": [
         {
           "id": "karst",
           "title": "Карстский Доминион",
           "imageLabel": "Карта страны",
           "description": "Горная держава с развитой металлургией.",
-          "fullDescription": "Карстский Доминион управляется советом крепостей и промышленными кланами. Главный экспорт — сплавы и осадные машины, что делает их ключевым партнёром для военных блоков."
+          "fullDescription": "Карстский Доминион управляется советом крепостей и промышленными кланами. Главный экспорт — сплавы и осадные машины, что делает их ключевым партнёром для военных блоков.",
+          "translations": {
+            "en": {
+              "title": "Karst Dominion",
+              "imageLabel": "Realm map",
+              "description": "A mountainous power with advanced metallurgy.",
+              "fullDescription": "The Karst Dominion is ruled by a council of fortresses and industrial clans. Its chief exports are alloys and siege engines, making it a crucial partner for military coalitions."
+            }
+          }
         },
         {
           "id": "valen",
           "title": "Валенские Пределы",
           "imageLabel": "Контур границ",
           "description": "Аграрный пояс и крупнейшие хлебные рынки.",
-          "fullDescription": "Валенские Пределы — равнинная страна, контролирующая плодородные долины и речные каналы. Несмотря на внешнюю мягкость, местные ополчения быстро мобилизуются и славятся дальнобойной артиллерией."
+          "fullDescription": "Валенские Пределы — равнинная страна, контролирующая плодородные долины и речные каналы. Несмотря на внешнюю мягкость, местные ополчения быстро мобилизуются и славятся дальнобойной артиллерией.",
+          "translations": {
+            "en": {
+              "title": "Valen Marches",
+              "imageLabel": "Border outline",
+              "description": "An agrarian belt with the largest grain markets.",
+              "fullDescription": "The Valen Marches are a lowland realm controlling fertile valleys and river canals. Despite their soft outward image, local militias mobilize quickly and are famous for their long-range artillery."
+            }
+          }
         },
         {
           "id": "serev",
           "title": "Серевийская Лига",
           "imageLabel": "Флаг лиги",
           "description": "Морская конфедерация островных княжеств.",
-          "fullDescription": "Серевийская Лига соединяет десятки портов единым морским кодексом. Лига богатеет на транзите и пиратском выкупе, а её флот балансирует силы между континентальными империями."
+          "fullDescription": "Серевийская Лига соединяет десятки портов единым морским кодексом. Лига богатеет на транзите и пиратском выкупе, а её флот балансирует силы между континентальными империями.",
+          "translations": {
+            "en": {
+              "title": "Serevian League",
+              "imageLabel": "League flag",
+              "description": "A seafaring confederation of island principalities.",
+              "fullDescription": "The Serevian League binds dozens of ports under a single maritime code. It grows wealthy through transit trade and pirate ransoms, while its fleet balances power between the continental empires."
+            }
+          }
         },
         {
           "id": "thorn",
           "title": "Торнское Царство",
           "imageLabel": "Герб царства",
           "description": "Центральная монархия с древней династией.",
-          "fullDescription": "Торнское Царство — культурное и религиозное ядро материка. Цари Торна опираются на храмовые ордена и сеть вассальных княжеств, сохраняя влияние через ритуал и династические браки."
+          "fullDescription": "Торнское Царство — культурное и религиозное ядро материка. Цари Торна опираются на храмовые ордена и сеть вассальных княжеств, сохраняя влияние через ритуал и династические браки.",
+          "translations": {
+            "en": {
+              "title": "Kingdom of Thorn",
+              "imageLabel": "Royal crest",
+              "description": "A central monarchy with an ancient dynasty.",
+              "fullDescription": "The Kingdom of Thorn is the cultural and religious core of the continent. Its rulers rely on temple orders and a network of vassal principalities, preserving influence through ritual and dynastic marriages."
+            }
+          }
         }
       ]
     },
     {
       "id": "orders",
       "title": "Органы власти",
+      "translations": {
+        "en": {
+          "title": "Power Structures"
+        }
+      },
       "items": [
         {
           "id": "great-council",
           "title": "Великий Совет",
           "imageLabel": "Печать совета",
           "description": "Надгосударственный арбитраж по договорам.",
-          "fullDescription": "Великий Совет собирается в сезоны перемирия и фиксирует межгосударственные договорённости. Решения совета формально рекомендательные, но нарушение резолюций почти всегда приводит к торговым санкциям."
+          "fullDescription": "Великий Совет собирается в сезоны перемирия и фиксирует межгосударственные договорённости. Решения совета формально рекомендательные, но нарушение резолюций почти всегда приводит к торговым санкциям.",
+          "translations": {
+            "en": {
+              "title": "Grand Council",
+              "imageLabel": "Council seal",
+              "description": "A supranational treaty arbitration body.",
+              "fullDescription": "The Grand Council meets during truce seasons to record agreements between states. Its rulings are formally advisory, yet ignoring them almost always results in trade sanctions."
+            }
+          }
         },
         {
           "id": "border-watch",
           "title": "Пограничная Стража",
           "imageLabel": "Знак стражи",
           "description": "Координационный центр приграничной обороны.",
-          "fullDescription": "Пограничная Стража отвечает за карты укреплений, сезонные гарнизоны и сигнализацию вдоль внешнего периметра мира. Их отчёты часто становятся основанием для мобилизации крупных армий."
+          "fullDescription": "Пограничная Стража отвечает за карты укреплений, сезонные гарнизоны и сигнализацию вдоль внешнего периметра мира. Их отчёты часто становятся основанием для мобилизации крупных армий.",
+          "translations": {
+            "en": {
+              "title": "Border Watch",
+              "imageLabel": "Watch insignia",
+              "description": "The coordination center of frontier defense.",
+              "fullDescription": "The Border Watch oversees fortification maps, seasonal garrisons, and warning systems along the outer perimeter of the world. Its reports often become the basis for mobilizing major armies."
+            }
+          }
         },
         {
           "id": "coin-chamber",
           "title": "Палата Монет",
           "imageLabel": "Монетный штамп",
           "description": "Регулятор валют и казначейских потоков.",
-          "fullDescription": "Палата Монет стандартизирует курс ключевых валют и сертифицирует монетные дворы. Без её печати торговые дома отказываются принимать крупные переводы."
+          "fullDescription": "Палата Монет стандартизирует курс ключевых валют и сертифицирует монетные дворы. Без её печати торговые дома отказываются принимать крупные переводы.",
+          "translations": {
+            "en": {
+              "title": "Coin Chamber",
+              "imageLabel": "Mint stamp",
+              "description": "Regulator of currencies and treasury flows.",
+              "fullDescription": "The Coin Chamber standardizes the rates of key currencies and certifies mints. Without its seal, merchant houses refuse to accept major transfers."
+            }
+          }
         }
       ]
     }

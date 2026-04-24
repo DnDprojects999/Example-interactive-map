@@ -4,6 +4,12 @@
       "id": "first-party",
       "title": "Первый отряд",
       "subtitle": "Игроки, с которых начинается текущая хроника Серконии.",
+      "translations": {
+        "en": {
+          "title": "First Party",
+          "subtitle": "The player characters who begin the current Serkonia chronicle."
+        }
+      },
       "items": [
         {
           "id": "golden-drake",
@@ -13,7 +19,16 @@
           "imageUrl": "",
           "accentColor": "#d8a94a",
           "description": "Яркий союзник партии, чьё имя пока знают только ближайшие спутники.",
-          "fullDescription": "Здесь можно хранить полную историю персонажа: происхождение, цели, связи с отрядом, важные клятвы, секреты и заметки по развитию героя."
+          "fullDescription": "Здесь можно хранить полную историю персонажа: происхождение, цели, связи с отрядом, важные клятвы, секреты и заметки по развитию героя.",
+          "translations": {
+            "en": {
+              "title": "Golden Wanderer",
+              "role": "Dragonborn envoy",
+              "imageLabel": "Hero portrait",
+              "description": "A vivid ally of the party whose true name is still known only to the closest companions.",
+              "fullDescription": "Use this card for the character's full story: origin, goals, ties to the party, key vows, secrets, and notes for future development."
+            }
+          }
         },
         {
           "id": "ash-scout",
@@ -23,7 +38,16 @@
           "imageUrl": "",
           "accentColor": "#7f8f8b",
           "description": "Проводник, который знает короткие пути через опасные земли.",
-          "fullDescription": "Развернутое описание раскрывается по клику на карточку. Сюда удобно вставлять заметки игрока, памятные сцены и личные зацепки для будущих сессий."
+          "fullDescription": "Развёрнутое описание раскрывается по клику на карточку. Сюда удобно вставлять заметки игрока, памятные сцены и личные зацепки для будущих сессий.",
+          "translations": {
+            "en": {
+              "title": "Scout of the Ash Roads",
+              "role": "Scout",
+              "imageLabel": "Hero portrait",
+              "description": "A guide who knows the shortest paths through dangerous lands.",
+              "fullDescription": "The expanded view opens when the card is clicked. This is a good place for player notes, memorable scenes, and personal hooks for future sessions."
+            }
+          }
         }
       ]
     },
@@ -31,6 +55,12 @@
       "id": "legends",
       "title": "Легенды Серконии",
       "subtitle": "Люди и существа, чьи поступки уже стали частью истории мира.",
+      "translations": {
+        "en": {
+          "title": "Legends of Serkonia",
+          "subtitle": "People and beings whose deeds have already become part of the world's history."
+        }
+      },
       "items": [
         {
           "id": "first-archivist",
@@ -40,7 +70,16 @@
           "imageUrl": "",
           "accentColor": "#9ca3af",
           "description": "Основатель традиции хранителей хроник и свидетель первых крупных союзов.",
-          "fullDescription": "Эту карточку можно использовать как пример для важных NPC, древних героев, правителей, пророков или целых легендарных отрядов."
+          "fullDescription": "Эту карточку можно использовать как пример для важных NPC, древних героев, правителей, пророков или целых легендарных отрядов.",
+          "translations": {
+            "en": {
+              "title": "The First Archivist",
+              "role": "Legendary figure",
+              "imageLabel": "Ancient portrait",
+              "description": "Founder of the chronicle-keepers' tradition and witness to the first great alliances.",
+              "fullDescription": "This card can serve as a template for important NPCs, ancient heroes, rulers, prophets, or even whole legendary companies."
+            }
+          }
         }
       ]
     }

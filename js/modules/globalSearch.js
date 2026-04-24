@@ -1,9 +1,9 @@
 import { getLocalizedText, getLocalizedValue } from "./localization.js";
+import { getUiText } from "./uiLocale.js";
 
 const SEARCH_LIMIT = 18;
 const SEARCH_KIND_TOKENS = Object.freeze({
   marker: "map",
-  activeMarker: "active",
   timeline: "timeline",
   archiveGroup: "archive",
   archiveItem: "archive",
@@ -20,7 +20,7 @@ function hasUsefulQuery(query) {
 }
 
 function compactText(parts) {
-  return parts.filter(Boolean).join(" В· ");
+  return parts.filter(Boolean).join(" · ");
 }
 
 // Search is intentionally built as a lightweight in-memory index from current
@@ -29,30 +29,15 @@ function createSearchIndex(state) {
   const entries = [];
 
   state.markersData.forEach((marker) => {
-    const title = getLocalizedText(marker, "title", state, "Метка");
-    const type = getLocalizedText(marker, "type", state, "Карта");
+    const title = getLocalizedText(marker, "title", state, getUiText(state, "marker_untitled"));
+    const type = getLocalizedText(marker, "type", state, getUiText(state, "search_label_map"));
     const description = getLocalizedText(marker, "description", state, "");
     const facts = getLocalizedValue(marker, "facts", state, []) || [];
     entries.push({
       type: "marker",
       id: marker.id,
       title,
-      label: "Карта",
-      excerpt: compactText([type, description, ...facts]),
-      haystack: normalize([title, type, description, ...facts].join(" ")),
-    });
-  });
-
-  (state.activeMapData?.markers || []).forEach((marker) => {
-    const title = getLocalizedText(marker, "title", state, "Активное событие");
-    const type = getLocalizedText(marker, "type", state, "Active Map");
-    const description = getLocalizedText(marker, "description", state, "");
-    const facts = getLocalizedValue(marker, "facts", state, []) || [];
-    entries.push({
-      type: "activeMarker",
-      id: marker.id,
-      title,
-      label: "Active Map",
+      label: getUiText(state, "search_label_map"),
       excerpt: compactText([type, description, ...facts]),
       haystack: normalize([title, type, description, ...facts].join(" ")),
     });
@@ -60,7 +45,7 @@ function createSearchIndex(state) {
 
   state.eventsData.forEach((event) => {
     const year = getLocalizedText(event, "year", state, "");
-    const title = getLocalizedText(event, "title", state, "Событие");
+    const title = getLocalizedText(event, "title", state, getUiText(state, "timeline_event"));
     const description = getLocalizedText(event, "description", state, "");
     entries.push({
       type: "timeline",
@@ -73,18 +58,18 @@ function createSearchIndex(state) {
   });
 
   state.archiveData.forEach((group) => {
-    const groupTitle = getLocalizedText(group, "title", state, "Раздел архива");
+    const groupTitle = getLocalizedText(group, "title", state, getUiText(state, "search_label_archive_section"));
     entries.push({
       type: "archiveGroup",
       id: group.id,
       title: groupTitle,
       label: "Archive",
-      excerpt: "Раздел архива",
+      excerpt: getUiText(state, "search_label_archive_section"),
       haystack: normalize(groupTitle),
     });
 
     (group.items || []).forEach((item) => {
-      const title = getLocalizedText(item, "title", state, "Карточка архива");
+      const title = getLocalizedText(item, "title", state, getUiText(state, "search_label_archive_card"));
       const description = getLocalizedText(item, "description", state, "");
       const fullDescription = getLocalizedText(item, "fullDescription", state, "");
       entries.push({
@@ -100,7 +85,7 @@ function createSearchIndex(state) {
   });
 
   state.heroesData.forEach((group) => {
-    const groupTitle = getLocalizedText(group, "title", state, "Группа героев");
+    const groupTitle = getLocalizedText(group, "title", state, getUiText(state, "search_label_hero_group"));
     const groupSubtitle = getLocalizedText(group, "subtitle", state, "");
     entries.push({
       type: "heroGroup",
@@ -112,7 +97,7 @@ function createSearchIndex(state) {
     });
 
     (group.items || []).forEach((hero) => {
-      const title = getLocalizedText(hero, "title", state, "Герой");
+      const title = getLocalizedText(hero, "title", state, getUiText(state, "search_label_hero"));
       const role = getLocalizedText(hero, "role", state, "");
       const description = getLocalizedText(hero, "description", state, "");
       const fullDescription = getLocalizedText(hero, "fullDescription", state, "");
@@ -167,7 +152,7 @@ export function createGlobalSearchController(options) {
     if (!hasUsefulQuery(normalizedQuery)) {
       const empty = document.createElement("div");
       empty.className = "global-search-empty";
-      empty.textContent = "Начни вводить минимум 2 символа.";
+      empty.textContent = getUiText(state, "search_start_typing");
       els.globalSearchResults.appendChild(empty);
       currentResults = [];
       return;
@@ -182,7 +167,7 @@ export function createGlobalSearchController(options) {
     if (!currentResults.length) {
       const empty = document.createElement("div");
       empty.className = "global-search-empty";
-      empty.textContent = "Ничего не нашлось. Попробуй другое слово.";
+      empty.textContent = getUiText(state, "search_nothing_found");
       els.globalSearchResults.appendChild(empty);
       return;
     }
@@ -201,7 +186,7 @@ export function createGlobalSearchController(options) {
       title.textContent = entry.title;
 
       const excerpt = document.createElement("span");
-      excerpt.textContent = entry.excerpt || "Перейти к записи";
+      excerpt.textContent = entry.excerpt || getUiText(state, "search_open_record");
 
       button.append(kind, title, excerpt);
       button.addEventListener("click", () => {
